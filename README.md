@@ -17,7 +17,8 @@
 2. 安装 Java
 3. 安装 [cargo-mobile2](https://github.com/tauri-apps/cargo-mobile2)
 4. 在 Android Studio 中下载 Android 模拟器或者连接真机
-5. 在项目根目录运行：`cargo-mobile2 run`
+5. 设置环境变量：CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=你的 NDK 链接目录（实在不会可以看我的 .cargo）
+6. 在项目根目录运行：`cargo-mobile2 run`
 
 如何进行 iOS 开发？（仅适用于 macOS）
 

@@ -4,10 +4,10 @@ plugins {
 }
 
 android {
-    namespace="com.example.ren_rs_refactor"
+    namespace="com.xphost.ren_rs_refactor"
     compileSdk = 34
     defaultConfig {
-        applicationId = "com.example.ren_rs_refactor"
+        applicationId = "com.xphost.ren_rs_refactor"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

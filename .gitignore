@@ -3,7 +3,8 @@ target/
 **/*.rs.bk
 
 # cargo-mobile2
-.cargo/
+.cargo/*
+!.cargo/config.toml
 
 # macOS
 .DS_Store
