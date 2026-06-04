@@ -1,3 +1,5 @@
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("rust")
@@ -19,6 +21,19 @@ android {
         jniLibs.srcDir("${ndkHome}/sources/third_party/vulkan/src/build-android/jniLibs")
     }
     buildTypes {
+        signingConfigs {
+            create("release") {
+                val keystorePropertiesFile = rootProject.file("keystore.properties")
+                val keystoreProperties = Properties()
+                if (keystorePropertiesFile.exists()) {
+                    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+                }
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            }
+        }
         getByName("debug") {
             isDebuggable = true
             isJniDebuggable = true
@@ -31,8 +46,9 @@ android {
             }
         }
         getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
-             proguardFiles(
+            proguardFiles(
                 *fileTree(".") { include("**/*.pro") }
                     .plus(getDefaultProguardFile("proguard-android-optimize.txt"))
                     .toList().toTypedArray()

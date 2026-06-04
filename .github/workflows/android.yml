@@ -43,12 +43,12 @@ jobs:
           java-version: "21"
           distribution: "temurin"
       # 为 Android 添加 Android Studio 编译器
-      - name: Install Android NDK
+      - name: Install Android Studio
         uses: android-actions/setup-android@v4
         with:
           cmdline-tools-version: 9477386
       # 添加 Android/iOS toolchain
-      - name: Install Rustup Android toolchain
+      - name: Install Rustup Android/iOS toolchain
         run: |
           rustup target add ${{ matrix.target }}
           cargo install cargo-mobile2
@@ -62,4 +62,4 @@ jobs:
           keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 --validity 10000 -alias upload -storepass ${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }} -dname "CN=xphost, OU=CandySharkStudio, O=CandySharkStudio, L=Beijing, S=Beijing, C=CN"
           # 生成配置
           echo -e "storePassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyPassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyAlias=upload\nkeyStorePath=/home/runner/upload-keystore.jks" > gen/android/keystore.properties
-          
+          # 部署图标
