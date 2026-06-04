@@ -1,0 +1,5 @@
+[app]
+name = "ren-rs-refactor"
+stylized-name = "Ren Rs Refactor"
+identifier = "com.example.ren_rs_refactor"
+template-pack = "winit"
