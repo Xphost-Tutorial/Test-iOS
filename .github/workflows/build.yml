@@ -1,4 +1,4 @@
-name: Build Actions
+name: Build PC Actions
 
 on:
   workflow_dispatch:

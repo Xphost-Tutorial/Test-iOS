@@ -1,4 +1,4 @@
-name: Build Actions
+name: Build iOS Actions
 
 on:
   workflow_dispatch:

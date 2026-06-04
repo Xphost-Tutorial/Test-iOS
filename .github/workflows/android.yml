@@ -1,4 +1,4 @@
-name: Build Actions
+name: Build Android Actions
 
 on:
   workflow_dispatch:
