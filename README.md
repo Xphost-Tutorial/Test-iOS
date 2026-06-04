@@ -1,8 +1,8 @@
-# Android build Ren-Rs-Refactor
+# Ren Rs Refactor
 
 这里是 Ren-Rs-Refactor！也就是使用 Rust 脱离 Tauri 并完成全平台构建打包的一个项目！
 
-是的！我们完全脱离了 Tauri！采取全部 UI 都使用 Rust softbuffer 去绘制！
+是的！我们完全脱离了 Tauri！采取全部 UI 都使用 winit + softbuffer 去绘制！
 
 如何进行开发？
 
