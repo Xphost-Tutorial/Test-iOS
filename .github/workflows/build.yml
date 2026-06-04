@@ -46,26 +46,6 @@ jobs:
             arch: arm64
             runs: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
-          # Android arm64
-          - os: android
-            arch: arm64
-            runs: ubuntu-latest
-            target: aarch64-linux-android
-          # Android x86_64
-          - os: android
-            arch: x86_64
-            runs: ubuntu-latest
-            target: x86_64-linux-android
-          # Android armv7
-          - os: android
-            arch: armv7
-            runs: ubuntu-latest
-            target: armv7-linux-androideabi
-          # iOS arm64
-          - os: ios
-            arch: arm64
-            runs: macos-latest
-            target: aarch64-apple-ios
 
     runs-on: ${{ matrix.runs }}
     steps:
@@ -76,19 +56,6 @@ jobs:
         with:
           toolchain: stable
           targets: ${{ matrix.target }}
-      # 为 Android 添加 Java 编译器
-      - name: Install Java toolchain
-        if: ${{ matrix.os == 'android' }}
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "temurin"
-      # 为 Android 添加 Android Studio 编译器
-      - name: Install Android NDK
-        if: ${{ matrix.os == 'android' }}
-        uses: android-actions/setup-android@v4
-        with:
-          cmdline-tools-version: 9477386
       # 为 Linux 添加部分依赖
       - name: Install Linux dependencies
         if: ${{ matrix.os == 'linux' }}
@@ -96,20 +63,58 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev pkg-config
           sudo apt-get install -y xdg-utils
-      # 添加 Android/iOS toolchain
-      - name: Install Rustup Android toolchain
-        if: ${{ matrix.os == 'android' || matrix.os == 'ios' }}
-        run: |
-          rustup target add ${{ matrix.target }}
-          cargo install cargo-mobile2
       # 开始打包正常的可执行文件
       - name: Build the app
-        if: ${{ matrix.os != 'android' && matrix.os != 'ios' }}
         run: cargo build --release --target ${{ matrix.target }}
-      # 开始打包 Android 并调用 Java keytool 生成签名
-      - name: Build Android app and sign app
-        if: ${{ matrix.platform == 'android' && matrix.platform != 'freebsd' }}
-        env:
-          NDK_HOME: /usr/local/lib/android/sdk/ndk/29.0.14206865
-          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/29.0.14206865
+      - name: Bundle macOS App file
+        if: ${{ matrix.os =='macos' }}
         run: |
+          APP_DIR=target/${{ matrix.target }}/release/bundle/macos/ren-rs-refactor-desktop.app
+          mkdir -p $APP_DIR/Contents/MacOS
+          cp target/${{ matrix.target }}/release/ren-rs-refactor-desktop $APP_DIR/Contents/MacOS/ren-rs-refactor-desktop
+          cat << EOF > $APP_DIR/Contents/Info.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleDevelopmentRegion</key>
+              <string>en</string>
+              <key>CFBundleExecutable</key>
+              <string>ren-rs-refactor-desktop</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.xphost.ren-rs-refactor-desktop</string>
+              <key>CFBundleName</key>
+              <string>ren-rs-refactor-desktop</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleShortVersionString</key>
+              <string>1.0</string>
+              <key>CFBundleVersion</key>
+              <string>1</string>
+              <key>CFBundleIconFile</key>
+              <string>AppIcon</string>
+              <key>HighResolutionCapable</key>
+              <true/>
+              <key>CFBundleInfoDictionaryVersion</key>
+              <string>6.0</string>
+          </dict>
+          </plist>
+          EOF
+      - name: Upload the Linux app
+        if: ${{ matrix.os == 'linux' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: target/${{ matrix.target }}/release/ren-rs-refactor-desktop
+      - name: Upload the macOS app
+        if: ${{ matrix.os == 'windows' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: target/${{ matrix.target }}/release/bundle/macos
+      - name: Upload the Windows app
+        if: ${{ matrix.os == 'windows' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: target/${{ matrix.target }}/release/ren-rs-refactor-desktop.exe

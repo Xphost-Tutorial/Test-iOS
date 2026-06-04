@@ -1,0 +1,32 @@
+name: Build Actions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # iOS arm64
+          - os: ios
+            arch: arm64
+            runs: macos-latest
+            target: aarch64-apple-ios
+    runs-on: ${{ matrix.runs }}
+    steps:
+      - uses: actions/checkout@v6
+      # 安装 Rust stable 版本
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+      # 添加 Android/iOS toolchain
+      - name: Install Rustup Android toolchain
+        run: |
+          rustup target add ${{ matrix.target }}
+          cargo install cargo-mobile2

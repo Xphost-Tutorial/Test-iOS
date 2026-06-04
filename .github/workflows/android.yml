@@ -1,0 +1,65 @@
+name: Build Actions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # Android arm64
+          - os: android
+            arch: arm64
+            runs: ubuntu-latest
+            target: aarch64-linux-android
+          # Android x86_64
+          - os: android
+            arch: x86_64
+            runs: ubuntu-latest
+            target: x86_64-linux-android
+          # Android armv7
+          - os: android
+            arch: armv7
+            runs: ubuntu-latest
+            target: armv7-linux-androideabi
+    runs-on: ${{ matrix.runs }}
+    steps:
+      - uses: actions/checkout@v6
+      # 安装 Rust stable 版本
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+      # 为 Android 添加 Java 编译器
+      - name: Install Java toolchain
+        if: ${{ matrix.os == 'android' }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "temurin"
+      # 为 Android 添加 Android Studio 编译器
+      - name: Install Android NDK
+        uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: 9477386
+      # 添加 Android/iOS toolchain
+      - name: Install Rustup Android toolchain
+        run: |
+          rustup target add ${{ matrix.target }}
+          cargo install cargo-mobile2
+      # 开始打包 Android 并调用 Java keytool 生成签名
+      - name: Build Android app and sign app
+        env:
+          NDK_HOME: /usr/local/lib/android/sdk/ndk/29.0.14206865
+          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/29.0.14206865
+        run: |
+          # 生成 Android 签名
+          keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 --validity 10000 -alias upload -storepass ${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }} -dname "CN=xphost, OU=CandySharkStudio, O=CandySharkStudio, L=Beijing, S=Beijing, C=CN"
+          # 生成配置
+          echo -e "storePassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyPassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyAlias=upload\nkeyStorePath=/home/runner/upload-keystore.jks" > gen/android/keystore.properties
+          
