@@ -106,15 +106,18 @@ jobs:
         with:
           name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
           path: target/${{ matrix.target }}/release/ren-rs-refactor-desktop
+          if-no-files-found: error
       - name: Upload the macOS app
-        if: ${{ matrix.os == 'windows' }}
+        if: ${{ matrix.os == 'macos' }}
         uses: actions/upload-artifact@v7
         with:
           name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
           path: target/${{ matrix.target }}/release/bundle/macos
+          if-no-files-found: error
       - name: Upload the Windows app
         if: ${{ matrix.os == 'windows' }}
         uses: actions/upload-artifact@v7
         with:
           name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
           path: target/${{ matrix.target }}/release/ren-rs-refactor-desktop.exe
+          if-no-files-found: error
