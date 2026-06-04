@@ -2,7 +2,9 @@
 
 这里是 Ren-Rs-Refactor！也就是使用 Rust 脱离 Tauri 并完成全平台构建打包的一个项目！
 
-是的！我们完全脱离了 Tauri！采取全部 UI 都使用 winit + softbuffer 去绘制！
+是的！我们完全脱离了 Tauri！采取全部 UI 都使用 winit + softbuffer 去绘制！不仅性能++，跨平台性也++了！
+
+本次跨平台的整合架构在[这里](./CROSS_PLATFORM.md)
 
 如何进行 PC 开发？
 
