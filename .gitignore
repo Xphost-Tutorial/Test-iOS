@@ -12,3 +12,6 @@ target/
 # self add
 .idea
 Cargo.lock
+
+# other add
+gen/apple3
