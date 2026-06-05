@@ -8,7 +8,7 @@ jobs:
     permissions:
       contents: write
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           # Android arm64
@@ -70,6 +70,9 @@ jobs:
         env:
           NDK_HOME: /usr/local/lib/android/sdk/ndk/29.0.14206865
           ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/29.0.14206865
+          CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER: /usr/local/lib/android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android28-clang
+          CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER: /usr/local/lib/android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android28-clang
+          CARGO_TARGET_ARMV7_LINUX_ANDROID_LINKER: /usr/local/lib/android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi28-clang
         run: |
           cargo android apk build ${{ matrix.arch }} --release
       # 上传工件！
