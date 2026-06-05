@@ -40,9 +40,8 @@ jobs:
       - name: Generate Project
         run: |
           brew install xcodegen
-          cd gen/apple/
-          mkdir ./assets
-          xcodegen generate
+          mkdir gen/apple/assets
+          xcodegen generate --spec gen/apple/project.yml --project gen/apple
       - name: Remove Sign
         run: |
           PROJ_FILE="gen/apple/ren-rs-refactor.xcodeproj/project.pbxproj"
