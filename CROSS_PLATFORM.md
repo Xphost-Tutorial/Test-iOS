@@ -22,7 +22,7 @@
 |Android|arm64|100%|
 |Android|x86_64|100%|
 |Android|armv7|100%|
-|iOS|arm64|100%|
+|iOS|arm64|缺少测试|
 
 接下来是一些冷门操作系统与架构！
 
@@ -37,6 +37,7 @@
 |Loongnix|mips64el|100%|
 |统信UOS|loongarch64|100%|
 |麒麟|loongarch64|100%|
+|OpenHarmony|aarch64|缺少测试|
 |BianBu|riscv64|缺少测试|
 |Debian|powerpc64le|缺少测试|
 |Linux|sparc64|缺少测试|
