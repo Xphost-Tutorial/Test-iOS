@@ -26,7 +26,46 @@ jobs:
           toolchain: stable
           targets: ${{ matrix.target }}
       # 添加 Android/iOS toolchain
-      - name: Install Rustup Android toolchain
+      - name: Install Rustup Android/iOS toolchain
         run: |
           rustup target add ${{ matrix.target }}
           cargo install cargo-mobile2
+      - name: Generate icon
+        run: |
+          cargo install tauri-cli
+          mkdir -p src-tauri
+          echo -e '{"bundle":{"icon":["icons/32x32.png","icons/128x128.png","icons/128x128@2x.png","icons/icon.icns","icons/icon.ico"]}}' > src-tauri/tauri.conf.json
+          cargo tauri icon ./app-icon.png
+          rsync -av --remove-source-files src-tauri/icons/ios/ gen/apple/Assets.xcassets
+      - name: Generate Project
+        run: |
+          brew install xcodegen
+          cd gen/apple/
+          xcodegen generate
+      - name: Remove Sign
+        run: |
+          PROJ_FILE="gen/apple/ren-rs-refactor.xcodeproj/project.pbxproj"
+          if [ -f "\$PROJ_FILE" ]; then
+            sed -i '' 's/DEVELOPMENT_TEAM = ".*";/DEVELOPMENT_TEAM = "";/g' "\$PROJ_FILE"
+            sed -i '' '/CODE_SIGN_IDENTITY/d' "\$PROJ_FILE"
+            sed -i '' '/CODE_SIGN_ENTITLEMENTS/d' "\$PROJ_FILE"
+          fi
+      - name: Start Build
+        run: |
+          CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO cargo apple build --target aarch64-apple-ios --release
+      - name: Generate payload and upload file
+        run: |
+          ARCHIVE_PATH=$(find gen -name "*.xcarchive" | head -n 1)
+          if [ -z $ARCHIVE_PATH ]; then
+            exit 1
+          fi
+          echo "Found archive at: $ARCHIVE_PATH"
+          mkdir -p Payload
+          cp -R "$ARCHIVE_PATH/Products/Applications/"*.app Payload/
+          zip -r ren-rs-refactor.unsigned.ipa Payload
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: ren-rs-refactor.unsigned.ipa
+          if-no-files-found: error

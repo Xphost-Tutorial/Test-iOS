@@ -25,7 +25,8 @@
 1. 安装 Xcode
 2. 安装 [cargo-mobile2](https://github.com/tauri-apps/cargo-mobile2)
 3. 在 Xcode 中下载 iOS 模拟器或者连接真机
-4. 在项目根目录运行：`cargo-mobile2 run`
+4. 在 gen/apple 目录下运行 `xcodegen generate`
+5. 在项目根目录运行：`cargo-mobile2 run`
 
 好了！如果还有啥不懂的操作请观看我的 [RenRsAction](https://github.com/xphost008/RenRsAction) 项目哦~！
 
@@ -33,4 +34,3 @@
 
 Android 签名流程：你需要在你的电脑上安装 `Java`，随后使用内置的 keytool 参考我的 github actions 签名！
 iOS 签名流程：你需要开通一个 Apple Developer 账号，然后在你的账户中创建一个 App ID，然后自行使用该 App ID 进行签名。
-
