@@ -52,7 +52,7 @@ jobs:
           fi
       - name: Start Build
         run: |
-          CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO cargo apple build --target aarch64-apple-ios --release
+          CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO cargo apple build --release
       - name: Generate payload and upload file
         run: |
           ARCHIVE_PATH=$(find gen -name "*.xcarchive" | head -n 1)
