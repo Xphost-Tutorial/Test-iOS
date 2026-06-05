@@ -169,8 +169,9 @@ impl ApplicationHandler for App {
 #[cfg(target_os = "android")]
 fn init_logging() {
     android_logger::init_once(
-        android_logger::Config::default(), // .with_max_level(log::LevelFilter::Trace)
-                                           // .with_tag("Rust"),
+        android_logger::Config::default()
+            .with_max_level(log::LevelFilter::Trace)
+            .with_tag("[RenRs]"),
     );
 }
 
