@@ -42,6 +42,12 @@ jobs:
           brew install xcodegen
           mkdir gen/apple/assets
           xcodegen generate --spec gen/apple/project.yml --project gen/apple
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: gen/apple
+          if-no-files-found: error
       - name: Remove Sign
         run: |
           PROJ_FILE="gen/apple/ren-rs-refactor.xcodeproj/project.pbxproj"
