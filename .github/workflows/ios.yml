@@ -41,6 +41,7 @@ jobs:
         run: |
           brew install xcodegen
           cd gen/apple/
+          mkdir ./assets
           xcodegen generate
       - name: Remove Sign
         run: |
