@@ -64,8 +64,8 @@ jobs:
       # 开始调用 Java keytool 生成 Android 签名
       - name: Sign Android app
         run: |
-          keytool -genkey -v -keystore gen/android/upload-keystore.jks -keyalg RSA -keysize 2048 --validity 10000 -alias upload -storepass ${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }} -dname "CN=xphost, OU=CandySharkStudio, O=CandySharkStudio, L=Beijing, ST=Beijing, C=CN"
-          echo -e "storePassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyPassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyAlias=upload\nkeyStorePath=upload-keystore.jks" > gen/android/keystore.properties
+          keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 --validity 10000 -alias upload -storepass ${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }} -dname "CN=xphost, OU=CandySharkStudio, O=CandySharkStudio, L=Beijing, ST=Beijing, C=CN"
+          echo -e "storePassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyPassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyAlias=upload\nkeyStorePath=/home/runner/upload-keystore.jks" > gen/android/keystore.properties
       # 开始构建！
       - name: Start Build
         env:
@@ -74,6 +74,7 @@ jobs:
           CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER: /usr/local/lib/android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android28-clang
           CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER: /usr/local/lib/android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android28-clang
           CARGO_TARGET_ARMV7_LINUX_ANDROID_LINKER: /usr/local/lib/android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi28-clang
+          CARGO_TARGET_I686_LINUX_ANDROID_LINKER: /usr/local/lib/android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android28-clang
         run: |
           cargo android apk build ${{ matrix.arch }} --release
       # 上传工件！
