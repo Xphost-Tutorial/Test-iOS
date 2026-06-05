@@ -1,4 +1,5 @@
 import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -20,20 +21,20 @@ android {
         val ndkHome = System.getenv("NDK_HOME")
         jniLibs.srcDir("${ndkHome}/sources/third_party/vulkan/src/build-android/jniLibs")
     }
-    buildTypes {
-        signingConfigs {
-            create("release") {
-                val keystorePropertiesFile = rootProject.file("keystore.properties")
-                val keystoreProperties = Properties()
-                if (keystorePropertiesFile.exists()) {
-                    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-                }
-                keyAlias = keystoreProperties["keyAlias"] as String
-                keyPassword = keystoreProperties["keyPassword"] as String
-                storeFile = file(keystoreProperties["storeFile"] as String)
-                storePassword = keystoreProperties["storePassword"] as String
+    signingConfigs {
+        create("release") {
+            val keystorePropertiesFile = rootProject.file("keystore.properties")
+            val keystoreProperties = Properties()
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
             }
+            keyAlias = keystoreProperties["keyAlias"] as String?
+            keyPassword = keystoreProperties["keyPassword"] as String?
+            storePassword = keystoreProperties["storePassword"] as String?
+            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
         }
+    }
+    buildTypes {
         getByName("debug") {
             isDebuggable = true
             isJniDebuggable = true

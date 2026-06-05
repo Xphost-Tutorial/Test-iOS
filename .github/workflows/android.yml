@@ -60,11 +60,12 @@ jobs:
           echo -e '{"bundle":{"icon":["icons/32x32.png","icons/128x128.png","icons/128x128@2x.png","icons/icon.icns","icons/icon.ico"]}}' > src-tauri/tauri.conf.json
           cargo tauri icon ./app-icon.png
           rsync -av --remove-source-files src-tauri/icons/android/ gen/android/app/src/main/res/
+          rm -rf gen/android/app/src/main/res/**/*.webp
       # 开始调用 Java keytool 生成 Android 签名
       - name: Sign Android app
         run: |
-          keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 --validity 10000 -alias upload -storepass ${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }} -dname "CN=xphost, OU=CandySharkStudio, O=CandySharkStudio, L=Beijing, ST=Beijing, C=CN"
-          echo -e "storePassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyPassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyAlias=upload\nkeyStorePath=/home/runner/upload-keystore.jks" > gen/android/keystore.properties
+          keytool -genkey -v -keystore gen/android/upload-keystore.jks -keyalg RSA -keysize 2048 --validity 10000 -alias upload -storepass ${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }} -dname "CN=xphost, OU=CandySharkStudio, O=CandySharkStudio, L=Beijing, ST=Beijing, C=CN"
+          echo -e "storePassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyPassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyAlias=upload\nkeyStorePath=upload-keystore.jks" > gen/android/keystore.properties
       # 开始构建！
       - name: Start Build
         env:
