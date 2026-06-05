@@ -1,13 +1,12 @@
+use rodio::{Decoder, Player, Source};
+use softbuffer::{Context, Surface};
 use std::io::Cursor;
 use std::sync::Arc;
+use tiny_skia::{Color, Pixmap, PixmapPaint, Transform};
 use winit::application::ApplicationHandler;
 use winit::event::{ElementState, WindowEvent};
 use winit::event_loop::EventLoop;
 use winit::window::{Fullscreen, Window, WindowAttributes};
-use rodio::{Decoder, Player, Source};
-use softbuffer::{Context, Surface};
-use tiny_skia::{Color, Pixmap, PixmapPaint, Transform};
-
 
 fn load_image_as_pixmap(bin: &[u8]) -> Option<Pixmap> {
     let img = image::load_from_memory(bin).ok()?.to_rgba8();
@@ -167,13 +166,11 @@ impl ApplicationHandler for App {
     }
 }
 
-
 #[cfg(target_os = "android")]
 fn init_logging() {
     android_logger::init_once(
-        android_logger::Config::default()
-            // .with_max_level(log::LevelFilter::Trace)
-            // .with_tag("Rust"),
+        android_logger::Config::default(), // .with_max_level(log::LevelFilter::Trace)
+                                           // .with_tag("Rust"),
     );
 }
 

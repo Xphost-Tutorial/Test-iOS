@@ -11,3 +11,4 @@ target/
 
 # self add
 .idea
+Cargo.lock
