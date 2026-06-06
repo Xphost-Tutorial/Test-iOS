@@ -56,8 +56,29 @@ jobs:
             sed -i '' '/CODE_SIGN_IDENTITY/d' "\$PROJ_FILE"
             sed -i '' '/CODE_SIGN_ENTITLEMENTS/d' "\$PROJ_FILE"
           fi
-      - name: Start Build
+      - name: Capture xcodebuild
         run: |
+          mkdir -p /tmp/renrs_wrapper
+          cat << EOF > /tmp/renrs_wrapper/xcodebuild
+          #!/bin/bash
+          PROJ_FILE="$REPO_DIR/gen/apple/ren-rs.xcodeproj/project.pbxproj"
+          if [ -f "\$PROJ_FILE" ]; then
+            sed -i '' 's/DEVELOPMENT_TEAM = ".*";/DEVELOPMENT_TEAM = "";/g' "\$PROJ_FILE"
+            sed -i '' '/CODE_SIGN_IDENTITY/d' "\$PROJ_FILE"
+            sed -i '' '/CODE_SIGN_ENTITLEMENTS/d' "\$PROJ_FILE"
+          fi
+          /usr/bin/xcodebuild "\$@" \\
+            CODE_SIGN_STYLE=Manual \\
+            CODE_SIGNING_ALLOWED=NO \\
+            CODE_SIGNING_REQUIRED=NO \\
+            PROVISIONING_PROFILE_SPECIFIER=""
+          EOF
+          chmod +x /tmp/renrs_wrapper/xcodebuild
+      - name: Start Build
+        env:
+          APPLE_DEVELOPMENT_TEAM: "woainimiao"
+        run: |
+          export PATH="/tmp/renrs_wrapper:$PATH"
           CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO cargo apple build --release
       - name: Generate payload and upload file
         run: |
