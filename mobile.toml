@@ -1,5 +1,5 @@
 [app]
-name = "ren-rs-refactor"
+name = "renrsrefactor"
 stylized-name = "Ren Rs Refactor"
-identifier = "com.xphost.ren_rs_refactor"
+identifier = "com.xphost.renrsrefactor"
 template-pack = "winit"
