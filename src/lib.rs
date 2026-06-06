@@ -186,6 +186,7 @@ pub fn desktop_main() {
     let mut app = App::new();
     event_loop.run_app(&mut app).unwrap();
 }
+// ── Android entry point ──────────────────────────────────────────
 #[cfg(target_os = "android")]
 use winit::platform::android::activity::AndroidApp;
 #[cfg(target_os = "android")]
@@ -194,6 +195,19 @@ pub fn android_main(app: AndroidApp) {
     init_logging();
     use winit::platform::android::EventLoopBuilderExtAndroid;
     let event_loop = EventLoop::builder().with_android_app(app).build().unwrap();
+    let mut app = App::new();
+    event_loop.run_app(&mut app).unwrap();
+}
+
+// ── iOS entry point ─────────────────────────────────────────────
+// Called from main.mm via FFI after UIApplication is set up.
+#[cfg(target_os = "ios")]
+#[no_mangle]
+pub extern "C" fn start_app() {
+    init_logging();
+    // On iOS, winit internally creates the UIWindow / UIViewController
+    // from the UIApplication's key window.  No extra platform setup needed.
+    let event_loop = EventLoop::new().unwrap();
     let mut app = App::new();
     event_loop.run_app(&mut app).unwrap();
 }
