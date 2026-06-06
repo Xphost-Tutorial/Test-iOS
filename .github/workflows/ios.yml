@@ -18,18 +18,23 @@ jobs:
     runs-on: ${{ matrix.runs }}
     steps:
       - uses: actions/checkout@v6
-
+      # 安装 Rust stable 版本
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
           targets: ${{ matrix.target }}
-
+      # 缓存 Rust Target 目录
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+          key: ${{ matrix.os }}-${{ matrix.arch }}
+      # 添加 Android/iOS toolchain
       - name: Install build dependencies
         run: |
           rustup target add ${{ matrix.target }}
           cargo install cargo-mobile2
-
+      # 开始生成图标
       - name: Generate icons
         run: |
           if ls gen/apple/Assets.xcassets/AppIcon.appiconset/*.png >/dev/null 2>&1; then
@@ -41,33 +46,23 @@ jobs:
           echo '{"bundle":{"icon":["icons/32x32.png","icons/128x128.png","icons/128x128@2x.png","icons/icon.icns","icons/icon.ico"]}}' > src-tauri/tauri.conf.json
           cargo tauri icon ./app-icon.png
           rsync -av --remove-source-files src-tauri/icons/ios/ gen/apple/Assets.xcassets/AppIcon.appiconset || true
-
-      - name: Prepare project for CI (no Apple account)
-        run: |
-          # Remove development team references (CI has no Apple developer account)
-          sed -i '' '/development-team/d' mobile.toml
-          sed -i '' '/DEVELOPMENT_TEAM/d' gen/apple/project.yml
-          sed -i '' '/development-team/d' Cargo.toml
-          # Fix GCC_PREPROCESSOR_DEFINITIONS which may be unset in CI
-          sed -i '' 's/\${GCC_PREPROCESSOR_DEFINITIONS:?}/\${GCC_PREPROCESSOR_DEFINITIONS:-}/g' gen/apple/project.yml
-          # Cargo builds to repo-root target/, linker looks in gen/apple/target/
+          # 这里额外做一步链接 ./target 去 gen/apple/target
           ln -sf "$(pwd)/target" gen/apple/target
-
+      # 生成 Xcode 项目
       - name: Generate Xcode project
         run: |
           brew install xcodegen
           mkdir -p gen/apple/assets
           xcodegen generate --spec gen/apple/project.yml --project gen/apple
-
-          # Strip signing from generated pbxproj
+          # 移除 project.pbxproj 下的所有签名。。
           PROJ="gen/apple/ren-rs-refactor.xcodeproj/project.pbxproj"
           sed -i '' 's/DEVELOPMENT_TEAM = "[^"]*";/DEVELOPMENT_TEAM = "";/g' "$PROJ"
           sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$PROJ"
           sed -i '' '/CODE_SIGN_IDENTITY/d' "$PROJ"
           sed -i '' '/CODE_SIGN_ENTITLEMENTS/d' "$PROJ"
           sed -i '' '/PROVISIONING_PROFILE_SPECIFIER/d' "$PROJ"
-
-      - name: Patch xcodebuild (strip -allowProvisioningUpdates, inject ad-hoc signing)
+      # 为 xcodebuild 打一个补丁
+      - name: Patch xcodebuild
         run: |
           XCB=$(xcode-select -p)/usr/bin/xcodebuild
           sudo cp "$XCB" "${XCB}.real"
@@ -89,19 +84,13 @@ jobs:
             "${args[@]}"
           WRAPPER
           sudo chmod +x "$XCB"
-
+      # 开始打包！
       - name: Build
         run: |
           set -o pipefail
           cargo apple build --release --verbose 2>&1 | tee build.log
         timeout-minutes: 30
-
-      - name: Restore xcodebuild
-        if: always()
-        run: |
-          XCB=$(xcode-select -p)/usr/bin/xcodebuild
-          if [ -f "${XCB}.real" ]; then sudo mv "${XCB}.real" "$XCB"; fi
-
+      # 打包并生成 ipa 文件
       - name: Package IPA
         run: |
           APP_PATH=$(find /Users/runner/Library/Developer/Xcode/DerivedData -name "*.app" -type d 2>/dev/null | head -n 1)
@@ -115,7 +104,6 @@ jobs:
           mkdir -p Payload
           cp -R "$APP_PATH" Payload/
           zip -r ren-rs-refactor.unsigned.ipa Payload
-          ls -lh ren-rs-refactor.unsigned.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v7

@@ -25,6 +25,3 @@ ndk-glue = "^0.7"
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
 simple_logger = "^5.2"
-
-[package.metadata.apple]
-development-team = "CandySharkStudio"

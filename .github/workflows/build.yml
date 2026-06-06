@@ -63,9 +63,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev pkg-config
           sudo apt-get install -y xdg-utils
+      # 缓存 Rust Target 目录
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+          key: ${{ matrix.os }}-${{ matrix.arch }}
       # 开始打包正常的可执行文件
       - name: Build the app
         run: cargo build --release --target ${{ matrix.target }}
+      # 单独处理一下 macOS 的 .app 文件
       - name: Bundle macOS App file
         if: ${{ matrix.os =='macos' }}
         run: |
@@ -100,6 +106,7 @@ jobs:
           </dict>
           </plist>
           EOF
+      # 上传三个工件！
       - name: Upload the Linux app
         if: ${{ matrix.os == 'linux' }}
         uses: actions/upload-artifact@v7

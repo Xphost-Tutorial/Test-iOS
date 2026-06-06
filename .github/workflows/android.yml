@@ -47,6 +47,11 @@ jobs:
         uses: android-actions/setup-android@v4
         with:
           cmdline-tools-version: 9477386
+      # 缓存 Rust Target 目录
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+          key: ${{ matrix.os }}-${{ matrix.arch }}
       # 添加 Android/iOS toolchain
       - name: Install Rustup Android/iOS toolchain
         run: |
