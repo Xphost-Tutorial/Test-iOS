@@ -14,4 +14,4 @@ target/
 Cargo.lock
 
 # other add
-gen/apple3
+gen/apple[0-9]

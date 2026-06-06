@@ -1,6 +1,6 @@
 name: ren-rs-refactor
 options:
-  bundleIdPrefix: com.xphost.ren_rs_refactor
+  bundleIdPrefix: com.xphost.renrsrefactor
   deploymentTarget:
     iOS: 14.0
     macOS: 11.0
@@ -12,7 +12,7 @@ settingGroups:
   app:
     base:
       PRODUCT_NAME: Ren Rs Refactor
-      PRODUCT_BUNDLE_IDENTIFIER: com.xphost.ren_rs_refactor
+      PRODUCT_BUNDLE_IDENTIFIER: com.xphost.renrsrefactor
       # DEVELOPMENT_TEAM: CandySharkStudio
 targetTemplates:
   app:
