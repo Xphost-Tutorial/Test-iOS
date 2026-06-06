@@ -76,7 +76,7 @@ jobs:
           chmod +x /tmp/renrs_wrapper/xcodebuild
       - name: Start Build
         env:
-          APPLE_DEVELOPMENT_TEAM: "woainimiao"
+          APPLE_DEVELOPMENT_TEAM: "CandySharkStudio"
         run: |
           export PATH="/tmp/renrs_wrapper:$PATH"
           CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO cargo apple build --release

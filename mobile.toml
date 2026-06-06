@@ -3,3 +3,6 @@ name = "ren-rs-refactor"
 stylized-name = "Ren Rs Refactor"
 identifier = "com.xphost.renrsrefactor"
 template-pack = "winit"
+
+[apple]
+development-team = "CandySharkStudio"
