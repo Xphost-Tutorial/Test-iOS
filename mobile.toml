@@ -5,4 +5,4 @@ identifier = "com.xphost.renrsrefactor"
 template-pack = "winit"
 
 [apple]
-development-team = "CandySharkStudio"
+# CI injects development-team via xcodebuild wrapper
