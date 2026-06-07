@@ -34,6 +34,10 @@ jobs:
         run: |
           rustup target add ${{ matrix.target }}
           cargo install cargo-mobile2
+          # Ensure template packs exist (rust-cache caches the binary but not templates)
+          if [ ! -d "$HOME/.cargo/.cargo-mobile2/templates/apps/winit" ]; then
+            cargo install cargo-mobile2 --force
+          fi
 
       - name: Prepare project for CI
         run: |
