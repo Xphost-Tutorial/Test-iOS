@@ -1,0 +1,17 @@
+# Uncomment the next line to define a global platform for your project
+
+target 'ren-rs_iOS' do
+platform :ios, '13.0'
+
+
+  # Pods for ren-rs_iOS
+
+end
+
+target 'ren-rs_macOS' do
+platform :osx, '11.0'
+
+
+  # Pods for ren-rs_macOS
+
+end

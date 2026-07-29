@@ -1,0 +1,437 @@
+{
+  "global_constants": {
+    "main_background_image": "MAIN_BACK"
+  },
+  "global_variables": {
+    "main_background_opacity": 0,
+    "main_button_group_opacity": 0,
+    "main_start_black_show": 0,
+    "main_settings_block_opacity": false,
+    "main_settings_block_show": 0,
+    "settings_music_volume": 100,
+    "settings_text_speed": 100,
+    "settings_is_fullscreen": false
+  },
+  "components": [],
+  "screen": [
+    {
+      "name": "main",
+      "components": [
+        {
+          "type": "gif-image",
+          "id": "main_background_image",
+          "properties": {
+            "gif-image": "global.constants.main_background_image",
+            "width": "100cqi",
+            "height": "100cqb",
+            "opacity": "global.variable.main_background_opacity",
+            "animation": [
+              {
+                "property": "opacity",
+                "duration": 2000,
+                "easing": "linear"
+              }
+            ]
+          }
+        },
+        {
+          "type": "button-rectangle",
+          "id": "start_game_menu_button",
+          "properties": {
+            "width": "20cqi",
+            "height": "10cqb",
+            "x": "60cqi",
+            "y": "25cqb",
+            "text": "开始游戏",
+            "font-size": "2cqi",
+            "font-weight": 400,
+
+            "animation": [
+              {
+                "property": "opacity",
+                "duration": 1000,
+                "easing": "linear"
+              }
+            ]
+          },
+          "callbacks": [
+            {
+              "name": "clicked",
+              "arguments": [],
+              "functions": [
+                {
+                  "type": "call_function",
+                  "name": "on_start_game_button_clicked",
+                  "arguments": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "button-rectangle",
+          "id": "settings_menu_button",
+          "properties": {
+            "width": "20cqi",
+            "height": "10cqb",
+            "x": "60cqi",
+            "y": "45cqb",
+            "text": "设置",
+            "font-size": "2cqi",
+            "animation": [
+              {
+                "property": "opacity",
+                "duration": 1000,
+                "easing": "linear"
+              }
+            ]
+          },
+          "callbacks": [
+            {
+              "name": "clicked",
+              "arguments": [],
+              "functions": [
+                {
+                  "type": "call_function",
+                  "name": "on_settings_button_clicked",
+                  "arguments": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "button-rectangle",
+          "id": "exit_game_menu_button",
+          "properties": {
+            "width": "20cqi",
+            "height": "10cqb",
+            "x": "60cqi",
+            "y": "65cqb",
+            "text": "退出",
+            "font-size": "2cqi",
+            "animation": [
+              {
+                "property": "opacity",
+                "duration": 1000,
+                "easing": "linear"
+              }
+            ]
+          },
+          "callbacks": [
+            {
+              "name": "clicked",
+              "arguments": [],
+              "functions": [
+                {
+                  "type": "call_function",
+                  "name": "on_exit_game_button_clicked",
+                  "arguments": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "main_black_screen",
+          "properties": {
+            "width": "100cqi",
+            "height": "100cqb",
+            "background": "black",
+            "opacity": 0,
+            "z": 10,
+            "animation": [
+              {
+                "property": "opacity",
+                "duration": 2000,
+                "easing": "linear"
+              }
+            ]
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "main_settings_screen",
+          "properties": {
+            "background": "rgba(0, 0, 0, 0.4)",
+            "opacity": "global.variable.main_settings_block_opacity",
+            "z": 10,
+            "visible": "global.variable.main_settings_block_show",
+            "animation": [
+              {
+                "property": "opacity",
+                "duration": 1000,
+                "easing": "linear"
+              }
+            ]
+          },
+          "children": [
+            {
+              "type": "toucharea",
+              "id": "main_settings_toucharea",
+              "properties": {
+                "width": "100cqi",
+                "height": "100cqb"
+              }
+            },
+            {
+              "type": "rectangle",
+              "id": "main_settings_background_box",
+              "properties": {
+                "width": "60cqi",
+                "height": "70cqb",
+                "x": "20cqi",
+                "y": "15cqb",
+                "paddings": "5cqb",
+                "background": "#88eeaa33",
+                "border-radius": "5cqi",
+                "border-width": "1cqi",
+                "border-color": "brown"
+              },
+              "children": [
+                {
+                  "type": "vertical-box",
+                  "id": "main_settings_vertical_box",
+                  "properties": {
+                    "spacing": "1cqb",
+                    "alignment": "start"
+                  },
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "main_settings_music_volume_text",
+                      "properties": {
+                        "text": "音乐音量（${global.variable.settings_music_volume}）",
+                        "font-size": "2cqi"
+                      }
+                    },
+                    {
+                      "type": "slider",
+                      "id": "main_settings_music_volume_slider",
+                      "properties": {
+                        "minimum": 0,
+                        "maximum": 100,
+                        "value": "global.variable.settings_music_volume"
+                      },
+                      "callbacks": [
+                        {
+                          "name": "changed",
+                          "arguments": ["v"],
+                          "functions": [
+                            {
+                              "type": "set_variable",
+                              "target": "settings_music_volume",
+                              "value": "self.v"
+                            },
+                            {
+                              "type": "call_function",
+                              "name": "save_settings",
+                              "arguments": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "main_settings_text_speed_text",
+                      "properties": {
+                        "text": "音乐音量（${global.variable.settings_text_speed}）",
+                        "font-size": "2cqi"
+                      }
+                    },
+                    {
+                      "type": "slider",
+                      "id": "main_settings_text_speed_slider",
+                      "properties": {
+                        "minimum": 0,
+                        "maximum": 100,
+                        "value": "global.variable.settings_text_speed"
+                      },
+                      "callbacks": [
+                        {
+                          "name": "changed",
+                          "arguments": ["v"],
+                          "functions": [
+                            {
+                              "type": "set_variable",
+                              "target": "settings_text_speed",
+                              "value": "self.v"
+                            },
+                            {
+                              "type": "call_function",
+                              "name": "save_settings",
+                              "arguments": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "if": "backend.constants.is_mobile",
+                      "type": "checkbox",
+                      "id": "main_settings_is_fullscreen_checkbox",
+                      "properties": {
+                        "checked": "global.variable.settings_is_fullscreen"
+                      },
+                      "callbacks": [
+                        {
+                          "name": "toggled",
+                          "arguments": [],
+                          "functions": [
+                            {
+                              "type": "control_variable",
+                              "target": "settings_is_fullscreen",
+                              "calculate": "not"
+                            },
+                            {
+                              "type": "call_function",
+                              "name": "save_settings",
+                              "arguments": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "my-menu-button",
+                  "id": "main_settings_return_button",
+                  "properties": {
+                    "width": "8cqi",
+                    "height": "3cqb",
+                    "b-text": "返回",
+                    "b-font-size": "2cqi",
+                    "x": "46cqi",
+                    "y": "61cqb"
+                  },
+                  "callbacks": [
+                    {
+                      "name": "b-clicked",
+                      "arguments": [],
+                      "functions": [
+                        {
+                          "type": "call_function",
+                          "name": "return_clicked",
+                          "arguments": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "game_room",
+      "components": []
+    }
+  ],
+  "global_functions": [
+    {
+      "name": "on_main_mounted",
+      "arguments": [],
+      "functions": [
+        {
+          "type": "set_variable",
+          "target": "main_background_opacity",
+          "value": 1.0
+        },
+        {
+          "type": "sleep",
+          "duration": 1500
+        },
+        {
+          "type": "set_variable",
+          "target": "main_button_group_opacity",
+          "value": 1.0
+        }
+      ]
+    },
+    {
+      "name": "on_start_game_button_clicked",
+      "arguments": [],
+      "functions": [
+        {
+          "type": "screen_change",
+          "screen": "game_room"
+        }
+      ]
+    },
+    {
+      "name": "on_settings_button_clicked",
+      "arguments": [],
+      "functions": [
+        {
+          "type": "set_variable",
+          "target": "main_settings_block_opacity",
+          "value": 1.0
+        },
+        {
+          "type": "set_variable",
+          "target": "main_settings_block_show",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "on_exit_game_button_clicked",
+      "arguments": [],
+      "functions": [
+        {
+          "type": "exit"
+        }
+      ]
+    },
+    {
+      "name": "save_settings",
+      "arguments": [],
+      "functions": [
+        {
+          "type": "set_temp_variable",
+          "name": "my_config",
+          "value": {
+            "music_volume": "global.variable.settings_music_volume",
+            "text_speed": "global.variable.settings_text_speed",
+            "is_fullscreen": "global.variable.settings_is_fullscreen"
+          }
+        },
+        {
+          "type": "call_function",
+          "name": "save_settings_backend",
+          "arguments": ["my_config"]
+        },
+        {
+          "type": "call_function",
+          "name": "set_fullscreen_backend",
+          "arguments": ["global.variable.settings_is_fullscreen"]
+        }
+      ]
+    },
+    {
+      "name": "return_clicked",
+      "arguments": [],
+      "functions": [
+        {
+          "type": "set_variable",
+          "target": "main_settings_block_opacity",
+          "value": 0.0
+        },
+        {
+          "type": "sleep",
+          "duration": 2000
+        },
+        {
+          "type": "set_variable",
+          "target": "main_settings_block_show",
+          "value": false
+        }
+      ]
+    }
+  ]
+}

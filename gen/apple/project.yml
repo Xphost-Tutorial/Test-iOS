@@ -1,0 +1,93 @@
+name: ren-rs
+options:
+  bundleIdPrefix: com.xphost.renrs
+  deploymentTarget:
+    iOS: 14.0
+    macOS: 11.0
+fileGroups: [../../src]
+configs:
+  debug: debug
+  release: release
+settingGroups:
+  app:
+    base:
+      PRODUCT_NAME: Ren Rs
+      PRODUCT_BUNDLE_IDENTIFIER: com.xphost.renrs
+      # DEVELOPMENT_TEAM: CandySharkStudio
+targetTemplates:
+  app:
+    type: application
+    sources:
+      - path: Sources
+    scheme:
+      environmentVariables:
+        RUST_BACKTRACE: full
+        RUST_LOG: info
+    settings:
+      groups: [app]
+targets:
+  ren-rs_iOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Assets.xcassets
+      - path: assets
+        buildPhase: resources
+        type: folder
+    info:
+      path: ren-rs_iOS/Info.plist
+      properties:
+        LSRequiresIPhoneOS: true
+        UIDeviceFamily: [1, 2]
+        UILaunchStoryboardName: LaunchScreen
+        UIRequiredDeviceCapabilities: [arm64, metal]
+        UIRequiresFullScreen: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        CFBundleShortVersionString: 1.0.0
+        CFBundleVersion: 1.0.0
+    scheme:
+      environmentVariables:
+        RUST_BACKTRACE: full
+        RUST_LOG: info
+    settings:
+      base:
+        ENABLE_BITCODE: false
+        ARCHS: [arm64]
+        VALID_ARCHS: arm64
+        INFOPLIST_OUTPUT_FORMAT: xml
+        PRODUCT_NAME: Ren Rs
+        PRODUCT_BUNDLE_IDENTIFIER: com.xphost.renrs
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        LIBRARY_SEARCH_PATHS[sdk=iphoneos*]: $(inherited) $(SRCROOT)/target/aarch64-apple-ios/$(CONFIGURATION)
+        LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]: $(inherited) "$(SRCROOT)/target/aarch64-apple-ios-sim/$(CONFIGURATION)"
+        ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: true
+        OTHER_LDFLAGS[sdk=iphoneos*]: -force_load $(SRCROOT)/target/aarch64-apple-ios/$(CONFIGURATION)/libren_rs.a
+        OTHER_LDFLAGS[sdk=iphonesimulator*]: -force_load $(SRCROOT)/target/aarch64-apple-ios-sim/$(CONFIGURATION)/libren_rs.a
+        groups: [app]
+    dependencies:
+      # - framework: libren_rs.a
+      #   embed: false
+      - sdk: CoreGraphics.framework
+      - sdk: Metal.framework
+      - sdk: MetalKit.framework
+      - sdk: QuartzCore.framework
+      - sdk: Security.framework
+      - sdk: UIKit.framework
+
+      - sdk: WebKit.framework
+    preBuildScripts:
+      - script: |-
+          PATH=${PATH}:${HOME:?}/.cargo/bin
+          CARGO_APPLE=`which cargo-apple`
+          ${CARGO_APPLE} xcode-script -v --platform "${PLATFORM_DISPLAY_NAME:?}" --sdk-root ${SDKROOT:?} --framework-search-paths "${FRAMEWORK_SEARCH_PATHS:?}" --header-search-paths "${HEADER_SEARCH_PATHS:?}" --gcc-preprocessor-definitions "${GCC_PREPROCESSOR_DEFINITIONS:-}" --configuration ${CONFIGURATION:?} ${FORCE_COLOR} ${ARCHS:?} ${FEATURES}
+        name: Build Rust Code
+        basedOnDependencyAnalysis: false
+        outputFiles:
+          - $(SRCROOT)/target/aarch64-apple-ios/${CONFIGURATION}/libren_rs.a
+          - $(SRCROOT)/target/aarch64-apple-ios-sim/${CONFIGURATION}/libren_rs.a

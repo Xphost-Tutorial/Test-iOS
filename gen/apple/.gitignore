@@ -1,0 +1,7 @@
+xcuserdata/
+build/
+
+.*
+!.gitignore
+
+*.xcodeproj

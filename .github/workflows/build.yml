@@ -1,0 +1,334 @@
+name: Build Ren Rs Test Actions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  # 构建打包桌面
+  build-desktop:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Windows x86_64
+          - os: windows
+            arch: x86_64
+            runs: windows-latest
+            target: x86_64-pc-windows-msvc
+          # Windows aarch64
+          - os: windows
+            arch: aarch64
+            runs: windows-11-arm
+            target: aarch64-pc-windows-msvc
+          # Windows i686
+          # - os: windows
+          #   arch: i686
+          #   runs: windows-latest
+          #   target: i686-pc-windows-msvc
+          # macOS aarch64
+          - os: macos
+            arch: aarch64
+            runs: macos-latest
+            target: aarch64-apple-darwin
+          # macOS x86_64
+          - os: macos
+            arch: x86_64
+            runs: macos-15-intel
+            target: x86_64-apple-darwin
+          # Linux x86_64
+          - os: linux
+            arch: x86_64
+            runs: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          # Linux aarch64
+          - os: linux
+            arch: aarch64
+            runs: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+
+    runs-on: ${{ matrix.runs }}
+    steps:
+      - uses: actions/checkout@v6
+      # 安装 Rust stable 版本
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+      # 为 Linux 添加部分依赖
+      - name: Install Linux dependencies
+        if: ${{ matrix.os == 'linux' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libfontconfig1-dev libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev pkg-config
+          sudo apt-get install -y xdg-utils
+      # 开始生成图标
+      - name: Generated icon
+        run: |
+          cargo install tauri-cli
+          mkdir -p src-tauri
+          echo '{"bundle":{"icon":["icons/32x32.png","icons/128x128.png","icons/128x128@2x.png","icons/icon.icns","icons/icon.ico"]}}' > src-tauri/tauri.conf.json
+          cargo tauri icon ./app-icon.png
+          mv src-tauri/icons/icon.png ./icon.png
+      # 移动图标（仅 Windows）
+      - name: Moving Icon (Only Windows)
+        if: ${{ matrix.os == 'windows' }}
+        run: |
+          mv src-tauri/icons/icon.ico ./icon.ico
+      # 开始打包正常的可执行文件
+      - name: Build the app
+        run: cargo build --release --target ${{ matrix.target }}
+      # 单独处理一下 macOS 的 .app 文件
+      - name: Bundle macOS App file
+        if: ${{ matrix.os == 'macos' }}
+        run: |
+          APP_DIR=target/${{ matrix.target }}/release/bundle/macos/ren-rs-desktop.app
+          mkdir -p $APP_DIR/Contents/MacOS
+          cp target/${{ matrix.target }}/release/ren-rs-desktop $APP_DIR/Contents/MacOS/ren-rs-desktop
+          cat << EOF > $APP_DIR/Contents/Info.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleDevelopmentRegion</key>
+              <string>en</string>
+              <key>CFBundleExecutable</key>
+              <string>ren-rs-desktop</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.xphost.renrs</string>
+              <key>CFBundleName</key>
+              <string>Ren Rs</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleShortVersionString</key>
+              <string>1.0</string>
+              <key>CFBundleVersion</key>
+              <string>1.0</string>
+              <key>CFBundleIconFile</key>
+              <string>AppIcon</string>
+              <key>HighResolutionCapable</key>
+              <true/>
+              <key>CFBundleInfoDictionaryVersion</key>
+              <string>6.0</string>
+          </dict>
+          </plist>
+          EOF
+          echo "APPL????" > $APP_DIR/Contents/PkgInfo
+          mkdir -p $APP_DIR/Contents/Resources
+          cp src-tauri/icons/icon.icns $APP_DIR/Contents/Resources/AppIcon.icns
+      # 上传三个工件！
+      - name: Upload the Linux app
+        if: ${{ matrix.os == 'linux' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: target/${{ matrix.target }}/release/ren-rs-desktop
+          if-no-files-found: error
+      - name: Upload the macOS app
+        if: ${{ matrix.os == 'macos' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: target/${{ matrix.target }}/release/bundle/macos
+          if-no-files-found: error
+      - name: Upload the Windows app
+        if: ${{ matrix.os == 'windows' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: target/${{ matrix.target }}/release/ren-rs-desktop.exe
+          if-no-files-found: error
+  # 构建打包 Android
+  build-android:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Android arm64
+          - os: android
+            arch: aarch64
+            runs: ubuntu-latest
+            target: aarch64-linux-android
+          # Android x86_64
+          - os: android
+            arch: x86_64
+            runs: ubuntu-latest
+            target: x86_64-linux-android
+          # Android armv7
+          # - os: android
+          #   arch: armv7
+          #   runs: ubuntu-latest
+          #   target: armv7-linux-androideabi
+    runs-on: ${{ matrix.runs }}
+    steps:
+      - uses: actions/checkout@v6
+      # 安装 Rust stable 版本
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+      # 为 Android 添加 Java 编译器
+      - name: Install Java toolchain
+        if: ${{ matrix.os == 'android' }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "temurin"
+      # 为 Android 添加 Android Studio 编译器
+      - name: Install Android Studio
+        uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: 9477386
+      # 添加 Android/iOS toolchain
+      - name: Install Rustup Android/iOS toolchain
+        run: |
+          rustup target add ${{ matrix.target }}
+          cargo install cargo-mobile2
+      # 开始生成图标
+      - name: Generated icon
+        run: |
+          cargo install tauri-cli
+          mkdir -p src-tauri
+          echo -e '{"bundle":{"icon":["icons/32x32.png","icons/128x128.png","icons/128x128@2x.png","icons/icon.icns","icons/icon.ico"]}}' > src-tauri/tauri.conf.json
+          cargo tauri icon ./app-icon.png
+          mv src-tauri/icons/icon.png ./icon.png
+          rsync -av --remove-source-files src-tauri/icons/android/ gen/android/app/src/main/res/
+          mkdir -p gen/android/app/src/main/assets
+          rm -rf gen/android/app/src/main/res/**/*.webp
+      # 开始调用 Java keytool 生成 Android 签名
+      - name: Sign Android app
+        run: |
+          keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 --validity 10000 -alias upload -storepass ${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }} -dname "CN=xphost, OU=CandySharkStudio, O=CandySharkStudio, L=Beijing, ST=Beijing, C=CN"
+          echo -e "storePassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyPassword=${{ secrets.MY_ANDROID_KEYTOOL_PASSWORD }}\nkeyAlias=upload\nstoreFile=/home/runner/upload-keystore.jks" > gen/android/keystore.properties
+          chmod 755 gen/android/gradlew
+      # 开始构建！
+      - name: Start Build
+        env:
+          NDK_HOME: /usr/local/lib/android/sdk/ndk/29.0.14206865
+          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/29.0.14206865
+          CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER: /usr/local/lib/android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android28-clang
+          CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER: /usr/local/lib/android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android28-clang
+          CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER: /usr/local/lib/android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi28-clang
+          CARGO_TARGET_I686_LINUX_ANDROID_LINKER: /usr/local/lib/android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android28-clang
+        run: |
+          cargo android apk build ${{ matrix.arch }} --release
+      # 上传工件！
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk
+          if-no-files-found: error
+  # 构建打包 iOS
+  build-ios:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # iOS arm64
+          - os: ios
+            arch: aarch64
+            runs: macos-latest
+            target: aarch64-apple-ios
+    runs-on: ${{ matrix.runs }}
+    steps:
+      - uses: actions/checkout@v6
+      # 安装 Rust 工具链
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+      # 安装 Rust 工具链/依赖
+      - name: Install build dependencies
+        run: |
+          rustup target add ${{ matrix.target }}
+          cargo install cargo-mobile2
+          # Ensure template packs exist (rust-cache caches the binary but not templates)
+          if [ ! -d "$HOME/.cargo/.cargo-mobile2/templates/apps/winit" ]; then
+            cargo install cargo-mobile2 --force
+          fi
+      # 链接 Rust Target
+      - name: Link targets
+        run: |
+          ln -sf "$(pwd)/target" gen/apple/target
+      # 生成图标
+      - name: Generate icons
+        run: |
+          cargo install tauri-cli
+          mkdir -p src-tauri
+          echo '{"bundle":{"icon":["icons/32x32.png","icons/128x128.png","icons/128x128@2x.png","icons/icon.icns","icons/icon.ico"]}}' > src-tauri/tauri.conf.json
+          cargo tauri icon ./app-icon.png
+          mv src-tauri/icons/icon.png ./icon.png
+          rm -rf gen/apple/Assets.xcassets/AppIcon.appiconset/*.png
+          rsync -av --remove-source-files src-tauri/icons/ios/ gen/apple/Assets.xcassets/AppIcon.appiconset || true
+      # 生成 xcode 项目
+      - name: Generate Xcode project
+        run: |
+          brew install xcodegen
+          mkdir -p gen/apple/assets
+          xcodegen generate --spec gen/apple/project.yml --project gen/apple
+          PROJ="gen/apple/ren-rs.xcodeproj/project.pbxproj"
+          sed -i '' 's/DEVELOPMENT_TEAM = "[^"]*";/DEVELOPMENT_TEAM = "";/g' "$PROJ"
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$PROJ"
+          sed -i '' '/CODE_SIGN_IDENTITY/d' "$PROJ"
+          sed -i '' '/CODE_SIGN_ENTITLEMENTS/d' "$PROJ"
+          sed -i '' '/PROVISIONING_PROFILE_SPECIFIER/d' "$PROJ"
+      # 为 xcodebuild 打补丁
+      - name: Patch xcodebuild
+        run: |
+          XCB=$(xcode-select -p)/usr/bin/xcodebuild
+          sudo cp "$XCB" "${XCB}.real"
+          sudo tee "$XCB" > /dev/null << 'WRAPPER'
+          #!/bin/bash
+          args=()
+          for a in "$@"; do
+            case "$a" in
+              -allowProvisioningUpdates|-allowProvisioningDeviceRegistration) ;;
+              *) args+=("$a") ;;
+            esac
+          done
+          exec "${0}.real" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM= \
+            "${args[@]}"
+          WRAPPER
+          sudo chmod +x "$XCB"
+      # 开始构建
+      - name: Start Build
+        run: |
+          set -o pipefail
+          cargo apple build --release --verbose 2>&1 | tee build.log
+        timeout-minutes: 30
+      # 打包 ipa 文件
+      - name: Package IPA
+        run: |
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "*.app" -type d 2>/dev/null | head -n 1)
+          if [ -z "$APP_PATH" ]; then APP_PATH=$(find . -name "*.app" -type d 2>/dev/null | head -n 1); fi
+          if [ -z "$APP_PATH" ]; then
+            echo "ERROR: No .app found"
+            tail -40 build.log
+            exit 1
+          fi
+          echo "Found: $APP_PATH"
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -r ren-rs.unsigned.ipa Payload
+          ls -lh ren-rs.unsigned.ipa
+      # 上传工件
+      - name: Upload IPA
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: ren-rs.unsigned.ipa
+          if-no-files-found: error

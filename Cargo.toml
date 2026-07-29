@@ -1,0 +1,82 @@
+[package]
+name = "ren-rs"
+description = "VN Engine for Ren'Rs!"
+version = "0.1.0"
+authors = ["xphost <xphost@foxmail.com>"]
+edition = "2024"
+license = "Apache 2.0"
+build = "build.rs"
+
+[lib]
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[package.metadata.cargo-android]
+app-activity-name = "com.xphost.renrs.MainActivity"
+app-dependencies = [
+    "androidx.webkit:webkit:1.6.1",
+    "androidx.appcompat:appcompat:1.6.1",
+    "com.google.android.material:material:1.8.0",
+]
+project-dependencies = [ "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21" ]
+app-plugins = [ "org.jetbrains.kotlin.android" ]
+app-permissions = [ "android.permission.INTERNET" ]
+app-theme-parent = "Theme.MaterialComponents.DayNight.DarkActionBar"
+vulkan-validation = false
+
+[package.metadata.cargo-android.env-vars]
+WRY_ANDROID_PACKAGE = "com.xphost.renrs"
+WRY_ANDROID_LIBRARY = "ren-rs"
+WRY_ANDROID_KOTLIN_FILES_OUT_DIR = "<android-project-dir>/app/src/main/kotlin/com/xphost/renrs"
+
+[package.metadata.cargo-apple.ios]
+frameworks = [ "WebKit" ]
+
+[features]
+default = ["enable-desktop"]
+enable-desktop = ["dep:wry", "dep:tao", "dep:steamworks"]
+enable-webbrowsers = []
+
+[[bin]]
+name = "ren-rs-desktop"
+path = "gen/bin/desktop.rs"
+
+[package.metadata.winres]
+LegalCopyright = "Copyright © 2026"
+FileDescription = "VN Engine for Ren Rs!"
+
+[dependencies]
+log = "^0.4"
+serde = { version = "^1.0", features = ["derive"] }
+serde_json = "^1.0"
+
+# self add
+rusqlite = { version = "^0.40", features = ["bundled"] } # Rust SQLite wrapper!
+aes = "^0.9"
+base64 = "^0.22"
+
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = "^0.15"
+ndk-glue = "^0.7"
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+simple_logger = "^5.2"
+
+[target.'cfg(target_os = "windows")'.build-dependencies]
+winres = "^0.1"
+
+[target.'cfg(all(not(target_os = "android"), not(target_os = "ios")))'.dependencies]
+dirs = "^6.0"
+wry = { version = "^0.55", optional = true }
+tao = { version = "^0.35", optional = true }
+
+[target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
+wry = "^0.55"
+tao = "^0.35"
+jni = "^0.22"
+ndk-context = "^0.1"
+
+[target.'cfg(any(all(target_os = "windows", target_arch = "x86_64"), all(target_os = "macos", target_arch = "aarch64"), target_os = "linux"))'.dependencies]
+steamworks = { version = "^0.13", optional = true }
+
+[target.'cfg(target_os = "ios")'.dependencies]
+core-foundation = "0.10"

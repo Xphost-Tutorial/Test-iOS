@@ -1,0 +1,8 @@
+[app]
+name = "ren-rs"
+stylized-name = "Ren Rs"
+identifier = "com.xphost.renrs"
+template-pack = "wry"
+
+[apple]
+# 留空 apple 键。

@@ -1,0 +1,24 @@
+# Rust
+target/
+
+# cargo-mobile2
+.cargo/*
+!.cargo/config.toml
+
+# macOS
+.DS_Store
+
+# self add
+.idea
+Cargo.lock
+
+# other add
+icon.ico
+icon.png
+
+# my
+/src/lib[0-9].rs
+**/*.html.bak
+**/*.css.bak
+**/*.js.bak
+**/*.rs.bak

@@ -1,0 +1,9 @@
+{
+    "--project_name": "ren-rs",
+    "--project_stylized_name": "Ren Rs",
+    "--project_identifier": "com.xphost.renrs",
+    "--project_version": "0.1.0",
+    "--project_author": "xphost <xphost@foxmail.com>",
+    "--project_description": "VN Engine for Ren'Rs!",
+    "--project_license": "Apache 2.0"
+}

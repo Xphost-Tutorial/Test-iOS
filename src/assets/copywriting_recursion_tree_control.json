@@ -1,0 +1,219 @@
+{
+  "global_constants": {
+    "main_background_image": "MAIN_BACK",
+    "george_illustration": "GEORGE_ILLUSTRATION"
+  },
+  "global_variables": {
+    "main_background_opacity": 0,
+    "main_button_group_opacity": 0,
+    "main_start_black_show": 0,
+    "main_settings_block_opacity": 0,
+    "main_settings_block_show": false,
+    "settings_music_volume": 100,
+    "settings_text_speed": 100,
+    "settings_is_fullscreen": false
+  },
+  "components": [
+    {
+      "name": "my-menu-button",
+      "inherits": "button",
+      "component-properties": {
+        "b-font-size": "0px",
+        "b-text": ""
+      },
+      "component-callbacks": ["b-clicked"],
+      "type": "button",
+      "properties": {
+        "width": "root.b-width",
+        "height": "root.b-height",
+        "background": "transparent"
+      },
+      "children": [
+        {
+          "type": "text",
+          "properties": {
+            "color": "green",
+            "font-size": "root.b-font-size",
+            "stroke": "lightgreen",
+            "stroke-width": "0.5cqi",
+            "horizontal-alignment": "center",
+            "vertical-alignment": "center",
+            "text": "root.b-text"
+          }
+        }
+      ],
+      "callbacks": [
+        {
+          "name": "clicked",
+          "arguments": [],
+          "functions": [
+            { "type": "call_function", "name": "root.b-clicked", "arguments": [] }
+          ]
+        }
+      ]
+    }
+  ],
+  "screen": [
+    {
+      "name": "main",
+      "components": [
+        {
+          "type": "gif-image",
+          "id": "main_background_image",
+          "properties": {
+            "gif-image": "global.constants.main_background_image",
+            "width": "100cqi",
+            "height": "100cqb",
+            "opacity": "global.variable.main_background_opacity"
+          },
+          "animation": [
+            { "property": "opacity", "duration": 2000, "easing": "ease-in-out" }
+          ]
+        },
+        {
+          "type": "vbox",
+          "id": "main_screen_button_group",
+          "properties": {
+            "width": "20cqi",
+            "alignment": "center",
+            "spacing": "4cqi",
+            "x": "70cqi",
+            "y": "0cqb",
+            "opacity": "global.variable.main_button_group_opacity"
+          },
+          "animation": [
+            { "property": "opacity", "duration": 1000, "easing": [0.68, -0.55, 0.265, 1.55] }
+          ],
+          "children": [
+            {
+              "type": "my-menu-button",
+              "id": "start_game_menu_button",
+              "properties": {
+                "width": "20cqi", "height": "10cqb",
+                "b-text": "开始游戏", "b-font-size": "2cqi"
+              },
+              "callbacks": [
+                {
+                  "name": "b-clicked",
+                  "arguments": [],
+                  "functions": [
+                    { "type": "change_screen", "screen": "game_room" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "my-menu-button",
+              "id": "settings_menu_button",
+              "properties": {
+                "width": "20cqi", "height": "10cqb",
+                "b-text": "设置", "b-font-size": "2cqi"
+              },
+              "callbacks": [
+                {
+                  "name": "b-clicked",
+                  "arguments": [],
+                  "functions": [
+                    { "type": "call_function", "name": "on_settings_button_clicked", "arguments": [] }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "my-menu-button",
+              "id": "exit_game_menu_button",
+              "properties": {
+                "width": "20cqi", "height": "10cqb",
+                "b-text": "退出", "b-font-size": "2cqi"
+              },
+              "callbacks": [
+                {
+                  "name": "b-clicked",
+                  "arguments": [],
+                  "functions": [
+                    { "type": "call_function", "name": "on_exit_game_button_clicked", "arguments": [] }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "main_black_screen",
+          "properties": {
+            "width": "100cqi", "height": "100cqb",
+            "background": "black",
+            "opacity": 0,
+            "z": 10
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "main_settings_screen",
+          "properties": {
+            "background": "rgba(0, 0, 0, 0.4)",
+            "opacity": "global.variable.main_settings_block_opacity",
+            "z": 10,
+            "visible": "global.variable.main_settings_block_show"
+          },
+          "animation": [
+            { "property": "opacity", "duration": 1000, "easing": "ease-out" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "game_room",
+      "components": [
+        {
+          "type": "image",
+          "id": "george_illustration",
+          "properties": {
+            "image": "global.constants.george_illustration",
+            "width": "100cqi",
+            "height": "100cqb",
+            "opacity": 1.0,
+            "x": 0,
+            "y": 0
+          }
+        }
+      ]
+    }
+  ],
+  "global_functions": [
+    {
+      "name": "on_main_mounted",
+      "arguments": [],
+      "functions": [
+        { "type": "set_variable", "target": "main_background_opacity", "value": 1.0 },
+        { "type": "sleep", "duration": 1500 },
+        { "type": "set_variable", "target": "main_button_group_opacity", "value": 1.0 }
+      ]
+    },
+    {
+      "name": "on_settings_button_clicked",
+      "arguments": [],
+      "functions": [
+        { "type": "set_variable", "target": "main_settings_block_opacity", "value": 1.0 },
+        { "type": "set_variable", "target": "main_settings_block_show", "value": true }
+      ]
+    },
+    {
+      "name": "on_exit_game_button_clicked",
+      "arguments": [],
+      "functions": [
+        { "type": "exit" }
+      ]
+    },
+    {
+      "name": "return_clicked",
+      "arguments": [],
+      "functions": [
+        { "type": "set_variable", "target": "main_settings_block_opacity", "value": 0.0 },
+        { "type": "sleep", "duration": 2000 },
+        { "type": "set_variable", "target": "main_settings_block_show", "value": false }
+      ]
+    }
+  ]
+}
