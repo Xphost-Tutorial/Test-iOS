@@ -1,7 +1,7 @@
 use tao::{
     event::{Event, StartCause, WindowEvent},
     event_loop::{ControlFlow, EventLoop, EventLoopWindowTarget},
-    window::WindowBuilder,
+    window::{Window, WindowBuilder},
 };
 use wry::{WebView, WebViewBuilder, http};
 
@@ -34,7 +34,7 @@ pub fn run() {
 
 fn build_webview(
     event_loop: &EventLoopWindowTarget<()>,
-) -> Result<WebView, Box<dyn std::error::Error>> {
+) -> Result<(Window, WebView), Box<dyn std::error::Error>> {
     let window = WindowBuilder::new()
         .with_title("Ren Rs")
         .build(&event_loop)?;
@@ -54,10 +54,11 @@ fn build_webview(
                 )
                 .unwrap_or_default()
         })
+        .with_background_color((0, 0, 0, 255))
         .with_html(
             r#"<html>
         <body>
-            <h1>Hello Wry!!</h1>
+            <h1 style="color: white;">Hello Wry!!</h1>
         </body>
         </html>"#,
         );
@@ -81,5 +82,5 @@ fn build_webview(
         builder.build_gtk(vbox)?
     };
 
-    Ok(webview)
+    Ok((window, webview))
 }
