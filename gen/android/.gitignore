@@ -8,3 +8,4 @@ build
 jniLibs
 .cxx
 local.properties
+buildSrc/.kotlin

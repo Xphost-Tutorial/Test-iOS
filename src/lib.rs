@@ -42,9 +42,9 @@ fn _start_app() {
     stop_unwind(|| desktop_main());
 }
 // 移动端 入口
-#[cfg(any(target_os = "ios", target_os = "android"))]
-#[inline(never)]
 #[unsafe(no_mangle)]
+#[inline(never)]
+#[cfg(any(target_os = "android", target_os = "ios"))]
 pub extern "C" fn start_app() {
     #[cfg(target_os = "android")]
     {
@@ -53,10 +53,12 @@ pub extern "C" fn start_app() {
             ren_rs,
             WryActivity,
             wry::android_setup,
-            _start_app
+            _start_app,
+            ::tao
         );
         wry::android_binding!(com_xphost, ren_rs);
     }
+    
     #[cfg(target_os = "ios")]
     _start_app()
 }

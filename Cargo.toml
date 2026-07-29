@@ -10,6 +10,10 @@ build = "build.rs"
 [lib]
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[[bin]]
+name = "ren-rs-desktop"
+path = "gen/bin/desktop.rs"
+
 [package.metadata.cargo-android]
 app-activity-name = "com.xphost.renrs.MainActivity"
 app-dependencies = [
@@ -25,20 +29,17 @@ vulkan-validation = false
 
 [package.metadata.cargo-android.env-vars]
 WRY_ANDROID_PACKAGE = "com.xphost.renrs"
-WRY_ANDROID_LIBRARY = "ren-rs"
+WRY_ANDROID_LIBRARY = "ren_rs"
 WRY_ANDROID_KOTLIN_FILES_OUT_DIR = "<android-project-dir>/app/src/main/kotlin/com/xphost/renrs"
 
 [package.metadata.cargo-apple.ios]
 frameworks = [ "WebKit" ]
 
 [features]
-default = ["enable-desktop"]
-enable-desktop = ["dep:wry", "dep:tao", "dep:steamworks"]
+default = ["enable-desktop", "enable-steamworks"]
+enable-desktop = ["dep:wry", "dep:tao"]
 enable-webbrowsers = []
-
-[[bin]]
-name = "ren-rs-desktop"
-path = "gen/bin/desktop.rs"
+enable-steamworks = ["dep:steamworks"]
 
 [package.metadata.winres]
 LegalCopyright = "Copyright © 2026"
@@ -56,7 +57,9 @@ base64 = "^0.22"
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "^0.15"
+jni = "^0.21"
 ndk-glue = "^0.7"
+ndk-context = "^0.1"
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
 simple_logger = "^5.2"
@@ -72,8 +75,6 @@ tao = { version = "^0.35", optional = true }
 [target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
 wry = "^0.55"
 tao = "^0.35"
-jni = "^0.22"
-ndk-context = "^0.1"
 
 [target.'cfg(any(all(target_os = "windows", target_arch = "x86_64"), all(target_os = "macos", target_arch = "aarch64"), target_os = "linux"))'.dependencies]
 steamworks = { version = "^0.13", optional = true }
