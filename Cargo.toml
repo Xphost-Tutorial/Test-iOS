@@ -20,6 +20,7 @@ app-dependencies = [
     "androidx.webkit:webkit:1.6.1",
     "androidx.appcompat:appcompat:1.6.1",
     "com.google.android.material:material:1.8.0",
+    # "androidx.lifecycle:lifecycle-process:2.7.0",
 ]
 project-dependencies = [ "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21" ]
 app-plugins = [ "org.jetbrains.kotlin.android" ]
