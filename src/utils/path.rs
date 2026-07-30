@@ -1,4 +1,5 @@
-use crate::utils::constant::*;
+#[cfg(not(target_os = "android"))]
+use crate::utils::constant::PACKAGE_IDENTIFIER;
 use std::{path::PathBuf, sync::OnceLock};
 
 pub static CONFIG_LOCAL_DIR: OnceLock<PathBuf> = OnceLock::new();

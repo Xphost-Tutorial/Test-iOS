@@ -177,7 +177,7 @@ jobs:
         if: ${{ matrix.os == 'android' }}
         uses: actions/setup-java@v5
         with:
-          java-version: "21"
+          java-version: "17"
           distribution: "temurin"
       # 为 Android 添加 Android Studio 编译器
       - name: Install Android Studio

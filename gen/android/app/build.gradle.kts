@@ -17,6 +17,13 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
     sourceSets.getByName("main") {
         // Vulkan validation layers
         val ndkHome = System.getenv("NDK_HOME")
@@ -67,5 +74,5 @@ dependencies {
     implementation("androidx.webkit:webkit:1.6.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.8.0")
-    // implementation("androidx.lifecycle:lifecycle-process:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-process:2.7.0")
 }
