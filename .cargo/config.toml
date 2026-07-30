@@ -1,6 +1,6 @@
 [target.aarch64-linux-android]
 # linker = '${NDK_HOME}\toolchains/llvm/prebuilt/windows-x86_64\bin\aarch64-linux-android28-clang.cmd'
-linker = 'D:\Compiles\vs\A-SDK\ndk\28.2.13676358\toolchains/llvm/prebuilt/windows-x86_64\bin\aarch64-linux-android28-clang.cmd'
+# linker = 'D:\Compiles\vs\A-SDK\ndk\28.2.13676358\toolchains/llvm/prebuilt/windows-x86_64\bin\aarch64-linux-android28-clang.cmd'
 rustflags = [
     "-Clink-arg=-landroid",
     "-Clink-arg=-llog",
