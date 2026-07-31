@@ -8,6 +8,8 @@ use wry::{WebView, WebViewBuilder, http};
 #[allow(unused)]
 use crate::utils::constant::*;
 
+const WINDOW_ICON: &[u8] = include_bytes!("../icon.png");
+
 pub fn run() {
     let event_loop = EventLoop::new();
     let mut webview = None;
@@ -35,8 +37,23 @@ pub fn run() {
 fn build_webview(
     event_loop: &EventLoopWindowTarget<()>,
 ) -> Result<(Window, WebView), Box<dyn std::error::Error>> {
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    let icon: Option<tao::window::Icon> = None;
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    let icon: Option<tao::window::Icon> = {
+        if let Ok(img) = image::load_from_memory(WINDOW_ICON) {
+            let rgba = img
+                .resize(64, 64, image::imageops::FilterType::Nearest)
+                .to_rgba8();
+            tao::window::Icon::from_rgba(rgba.into_raw(), 64, 64).ok()
+        } else {
+            None
+        }
+    };
+
     let window = WindowBuilder::new()
         .with_title("Ren Rs")
+        .with_window_icon(icon)
         .build(&event_loop)?;
 
     let builder = WebViewBuilder::new()
