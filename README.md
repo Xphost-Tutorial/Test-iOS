@@ -25,7 +25,7 @@ Lua 教程可以参考[官方教程 gitbook](https://candysharkstudio.gitbook.io
 2. 直接在项目根目录运行 `cargo run` 即可！Cargo 会自动帮你拉取所有依赖！
 3. 默认未使用 enable-desktop，默认未启用 enable-frontend，请各位按需启用。
 
-- **本地开发使用 change_by_json 去替换各位的项目基本信息！请修改 ren-rs.config.json 里面的内容！其余文件请酌情修改。。**
+- **本地开发请提前下载 Python 并使用 change_by_json.py 去替换各位的项目基本信息！请修改 ren-rs.config.json 里面的内容！其余文件请酌情修改。。**
 - 在你不确定是否要提交 pr 时，请尽量不要随意修改源代码里面的内容！除了你要为那 1% 的内容进行开发除外。。但也尽量只动 ui 文件夹里的内容即可，别的地方暂时就不要动啦~
 
 ### 如何进行 Android 开发？
@@ -82,7 +82,7 @@ iOS 签名流程：你需要开通一个 Apple Developer 账号，然后在你�
 
 # 开源协议
 
-以 MIT MIT MIT 协议开放源代码！各位仅需在【帮助】页鸣谢一下原作者即可！我同样允许各位以闭源形式发布各位的视觉小说！
+以 Apache 2.0 协议开放源代码！各位仅需在【帮助】页鸣谢一下原作者即可！我同样允许各位以闭源形式发布各位的视觉小说！
 
 # 鸣谢
 

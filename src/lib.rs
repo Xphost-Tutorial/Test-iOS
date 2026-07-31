@@ -51,14 +51,14 @@ pub extern "C" fn start_app() {
         tao::android_binding!(
             com_xphost,
             ren_rs,
-            WryActivity,
+            Rust,
             wry::android_setup,
             _start_app,
             ::tao
         );
         wry::android_binding!(com_xphost, ren_rs);
     }
-    
+
     #[cfg(target_os = "ios")]
     _start_app()
 }
