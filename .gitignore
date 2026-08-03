@@ -22,3 +22,5 @@ icon.png
 **/*.css.bak
 **/*.js.bak
 **/*.rs.bak
+
+*.log
