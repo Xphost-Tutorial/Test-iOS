@@ -51,7 +51,7 @@ pub extern "C" fn start_app() {
         tao::android_binding!(
             com_xphost,
             ren_rs,
-            Rust,
+            WryActivity,
             wry::android_setup,
             _start_app,
             ::tao

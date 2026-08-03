@@ -13,3 +13,5 @@ buildSrc/.kotlin
 app/src/main/kotlin/**/*
 !app/src/main/kotlin/**/
 !app/src/main/kotlin/com/xphost/renrs/MainActivity.kt
+
+keystore.properties
