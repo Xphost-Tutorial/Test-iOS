@@ -40,13 +40,12 @@ if missing:
 RAW_UNDERLINE_NAME = PATTERN_MAP['--project_name'].replace('-', '_')
 RAW_DIR_NAME = PATTERN_MAP['--project_identifier'].replace('.', '/')
 RAW_UNDERLINE_IDENTIFIER = '_'.join(PATTERN_MAP['--project_identifier'].split('.'))
-RAW_UNDERLINE_IDENTIFIER_FRONT_TWO = '_'.join(PATTERN_MAP['--project_identifier'].split('.')[:-1])
-RAW_UNDERLINE_IDENTIFIER_BY_COMMA = ','.join([RAW_UNDERLINE_IDENTIFIER_FRONT_TWO, PATTERN_MAP['--project_identifier'].split('.')[-1]])
+RAW_UNDERLINE_IDENTIFIER_BY_COMMA = ','.join(['_'.join(PATTERN_MAP['--project_identifier'].split('.')[:-1]), PATTERN_MAP['--project_identifier'].split('.')[-1]])
 NEW_UNDERLINE_NAME = REPLACEMENTS[PATTERN_MAP['--project_name']].replace('-', '_')
 NEW_DIR_NAME = REPLACEMENTS[PATTERN_MAP['--project_identifier']].replace('.', '/')
 NEW_UNDERLINE_IDENTIFIER = '_'.join(REPLACEMENTS[PATTERN_MAP['--project_identifier']].split('.'))
 NEW_UNDERLINE_IDENTIFIER_FRONT_TWO = '_'.join(REPLACEMENTS[PATTERN_MAP['--project_identifier']].split('.')[:-1])
-NEW_UNDERLINE_IDENTIFIER_BY_COMMA = ','.join([NEW_UNDERLINE_IDENTIFIER_FRONT_TWO, REPLACEMENTS[PATTERN_MAP['--project_identifier']].split('.')[-1]])
+NEW_UNDERLINE_IDENTIFIER_BY_COMMA = ','.join(['_'.join(REPLACEMENTS[PATTERN_MAP['--project_identifier']].split('.')[:-1]), REPLACEMENTS[PATTERN_MAP['--project_identifier']].split('.')[-1]])
 ANDROID_PROJECT_DIR = j(CURRENT_DIR, 'gen', 'android')
 KOTLIN_MAIN_PATH = j(ANDROID_PROJECT_DIR, 'app', 'src', 'main', 'kotlin')
 MAIN_ACTIVITY_PATH = j(KOTLIN_MAIN_PATH, NEW_DIR_NAME)
@@ -54,19 +53,18 @@ if os.path.exists(KOTLIN_MAIN_PATH):
     shutil.rmtree(KOTLIN_MAIN_PATH)
 os.makedirs(MAIN_ACTIVITY_PATH)
 with open(j(MAIN_ACTIVITY_PATH, 'MainActivity.kt'), 'w', encoding='UTF-8') as f:
-    f.write(f'package {REPLACEMENTS[PATTERN_MAP['--project_identifier']]}\n\n')
-    f.write('''class MainActivity : WryActivity() \{
-        override fun onCreate(savedInstanceState: Bundle?) \{
-            super.onCreate(savedInstanceState)
-            initSysdirs(filesDir.absolutePath)
-        }
-        external fun initSysdirs(filesDir: String)
-    }''')
+    f.write(f'package {REPLACEMENTS[PATTERN_MAP['--project_identifier']]}\n\nimport android.os.Bundle\n\n')
+    f.write('''class MainActivity : WryActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initSysdirs(filesDir.absolutePath)
+    }
+    external fun initSysdirs(filesDir: String)
+}''')
 
 REPLACEMENTS[RAW_UNDERLINE_NAME] = NEW_UNDERLINE_NAME
 REPLACEMENTS[RAW_DIR_NAME] = NEW_DIR_NAME
 REPLACEMENTS[RAW_UNDERLINE_IDENTIFIER] = NEW_UNDERLINE_IDENTIFIER
-REPLACEMENTS[RAW_UNDERLINE_IDENTIFIER_FRONT_TWO] = NEW_UNDERLINE_IDENTIFIER_FRONT_TWO
 REPLACEMENTS[RAW_UNDERLINE_IDENTIFIER_BY_COMMA] = NEW_UNDERLINE_IDENTIFIER_BY_COMMA
 
 EXCLUDED_PATHS = {
