@@ -5,7 +5,6 @@ use tao::{
 };
 use wry::{WebView, WebViewBuilder, http};
 
-#[allow(unused)]
 use crate::utils::constant::*;
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
@@ -50,7 +49,7 @@ fn build_webview(
     };
 
     let window = WindowBuilder::new()
-        .with_title("Ren Rsoooo")
+        .with_title(PACKAGE_NAME)
         .with_window_icon(icon)
         .build(&event_loop)?;
 
