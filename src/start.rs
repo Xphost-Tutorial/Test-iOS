@@ -8,6 +8,7 @@ use wry::{WebView, WebViewBuilder, http};
 #[allow(unused)]
 use crate::utils::constant::*;
 
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 const WINDOW_ICON: &[u8] = include_bytes!("../icon.png");
 
 pub fn run() {
@@ -17,10 +18,7 @@ pub fn run() {
         *control_flow = ControlFlow::Wait;
         match event {
             Event::NewEvents(StartCause::Init) => {
-                webview = Some(
-                    build_webview(event_loop)
-                        .expect("Lifecycle run create webview window is failed in Wry!"),
-                );
+                webview = build_webview(event_loop).ok();
             }
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested { .. },
@@ -52,7 +50,7 @@ fn build_webview(
     };
 
     let window = WindowBuilder::new()
-        .with_title("Ren Rs")
+        .with_title("Ren Rsoooo")
         .with_window_icon(icon)
         .build(&event_loop)?;
 

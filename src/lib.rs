@@ -23,8 +23,8 @@ fn init_logging() {
 // 桌面端 入口
 pub fn desktop_main() {
     init_logging();
-    utils::path::set_config_local_dir()
-        .expect("Lifecycle run set config local dir is failed in Desktop!");
+    #[cfg(not(target_os = "android"))]
+    utils::path::set_config_local_dir().expect("Lifecycle run get config local dir is failed!");
     start::run();
 }
 #[cfg(any(target_os = "android", target_os = "ios"))]
@@ -32,7 +32,14 @@ fn stop_unwind<F: FnOnce() -> T, T>(f: F) -> T {
     match std::panic::catch_unwind(std::panic::AssertUnwindSafe(f)) {
         Ok(t) => t,
         Err(e) => {
-            eprintln!("Lifecycle run unwind out of `rust` is failed err: {:?}", e);
+            let msg = if let Some(s) = e.downcast_ref::<&str>() {
+                s.to_string()
+            } else if let Some(s) = e.downcast_ref::<String>() {
+                s.clone()
+            } else {
+                "non-string panic payload".to_string()
+            };
+            log::error!("Lifecycle run unwind out of `rust` is failed err: \"{}\"", msg);
             std::process::abort();
         }
     }
@@ -49,16 +56,26 @@ pub extern "C" fn start_app() {
     #[cfg(target_os = "android")]
     {
         tao::android_binding!(
-            com_xphost,
-            ren_rs,
+            com_xphost,renrs,
             Rust,
             wry::android_setup,
             _start_app,
             ::tao
         );
-        wry::android_binding!(com_xphost, ren_rs);
+        wry::android_binding!(com_xphost,renrs);
     }
 
     #[cfg(target_os = "ios")]
     _start_app()
+}
+
+#[unsafe(no_mangle)]
+#[cfg(target_os = "android")]
+pub extern "system" fn Java_com_xphost_renrs_MainActivity_initSysdirs(
+    mut env: jni::JNIEnv,
+    _: jni::objects::JClass,
+    files_dir: jni::objects::JString,
+) {
+    let path: String = env.get_string(&files_dir).expect("Lifecycle run android env get files dir is failed!").into();
+    utils::path::CONFIG_LOCAL_DIR.set(std::path::PathBuf::from(path)).expect("Lifecycle run android config local dir set is failed!");
 }

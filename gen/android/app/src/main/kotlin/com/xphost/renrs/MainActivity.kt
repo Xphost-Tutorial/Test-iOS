@@ -1,3 +1,11 @@
 package com.xphost.renrs
 
-class MainActivity : WryActivity()
+import android.os.Bundle
+
+class MainActivity : WryActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initSysdirs(filesDir.absolutePath)
+    }
+    external fun initSysdirs(filesDir: String)
+}
