@@ -71,11 +71,13 @@ REPLACEMENTS[RAW_UNDERLINE_IDENTIFIER_BY_COMMA] = NEW_UNDERLINE_IDENTIFIER_BY_CO
 
 EXCLUDED_PATHS = {
     bj('change_by_ci.py'),
-    bj('change_by_json.sh'),
+    bj('change_by_json.py'),
     bj('ren-rs.config.json'),
     bj('target'),
     bj('README.md'),
     bj('LICENSE'),
+    bj('.git'),
+    bj('gen', 'android', 'app', 'build'),
     bj('CROSS_PLATFORM.md')
 }
 
