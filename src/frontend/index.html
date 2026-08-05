@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="/icon.png">
+    <title>Hello World!!</title>
+</head>
+<body>
+    <h1 id="name" style="font-family: sans-serif; text-align: center; margin-top: 50px; color: white;">准备就绪...</h1>
+    <div style="text-align: center;">
+        <button onclick="changeName()" style="padding: 10px 20px; font-size: 16px;">查询用户</button>
+        <button onclick="fullScreen()" style="padding: 10px 20px; font-size: 16px;">全屏</button>
+        <button onclick="exitWindow()" style="padding: 10px 20px; font-size: 16px;">退出</button>
+    </div>
+
+    <script>
+        const nameEl = document.getElementById("name");
+        let isFullscreen = true;
+        function changeName() {
+            nameEl.innerText = "查询中...";
+            const userId = 1;
+            fetch(`/api/get/user/${userId}` , {
+                method: 'GET',
+                headers: { 'Content-Type': 'text/plain' }
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("找不到该用户");
+                }
+                return res.text();
+            })
+            .then(username => {
+                nameEl.innerText = username;
+            })
+            .catch(err => {
+                nameEl.innerText = err.message;
+            });
+        }
+        function fullScreen() {
+            nameEl.innerText = "全屏中...";
+            fetch(`/api/set_full_screen` , {
+                method: 'PUT',
+                body: isFullscreen ? "1" : "0"
+            })
+            .then(() => {
+                nameEl.innerText = "全屏成功！";
+                isFullscreen = !isFullscreen;
+            })
+            .catch(err => {
+                nameEl.innerText = err.message;
+            });
+        }
+        function exitWindow() {
+            nameEl.innerText = "退出中...";
+            fetch(`/api/exit_window` , {
+                method: 'PUT'
+            })
+            .then(() => {
+                nameEl.innerText = "退出成功！";
+            })
+            .catch(err => {
+                nameEl.innerText = err.message;
+            });
+        }
+    </script>
+</body>
+</html>

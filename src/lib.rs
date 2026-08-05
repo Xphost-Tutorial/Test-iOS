@@ -1,6 +1,7 @@
 mod utils;
 
 mod start;
+mod steamworks;
 
 // Android 日志
 #[cfg(target_os = "android")]
@@ -25,7 +26,7 @@ pub fn desktop_main() {
     init_logging();
     #[cfg(not(target_os = "android"))]
     utils::path::set_config_local_dir().expect("Lifecycle run get config local dir is failed!");
-    start::run();
+    start::my_window::run();
 }
 #[cfg(any(target_os = "android", target_os = "ios"))]
 fn stop_unwind<F: FnOnce() -> T, T>(f: F) -> T {
@@ -39,7 +40,10 @@ fn stop_unwind<F: FnOnce() -> T, T>(f: F) -> T {
             } else {
                 "non-string panic payload".to_string()
             };
-            log::error!("Lifecycle run unwind out of `rust` is failed err: \"{}\"", msg);
+            log::error!(
+                "Lifecycle run unwind out of `rust` is failed err: \"{}\"",
+                msg
+            );
             std::process::abort();
         }
     }
@@ -76,6 +80,11 @@ pub extern "system" fn Java_com_xphost_renrs_MainActivity_initSysdirs(
     _: jni::objects::JClass,
     files_dir: jni::objects::JString,
 ) {
-    let path: String = env.get_string(&files_dir).expect("Lifecycle run android env get files dir is failed!").into();
-    utils::path::CONFIG_LOCAL_DIR.set(std::path::PathBuf::from(path)).expect("Lifecycle run android config local dir set is failed!");
+    let path: String = env
+        .get_string(&files_dir)
+        .expect("Lifecycle run android env get files dir is failed!")
+        .into();
+    utils::path::CONFIG_LOCAL_DIR
+        .set(std::path::PathBuf::from(path))
+        .expect("Lifecycle run android config local dir set is failed!");
 }
