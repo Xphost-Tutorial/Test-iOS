@@ -99,7 +99,7 @@ pub mod my_window {
 
         let callback = Arc::new(move |event| {
             match event {
-                UserEvent::Exit => {
+                UserEvent::ExitWindow => {
                     let _ = tx2.send(UserEvent::ExitWindow);
                 }
                 _ => ()
