@@ -69,28 +69,28 @@ fn run_backend_server(tx: mpsc::Sender<UserEvent>, callback: EventCallback) {
         let addr = "127.0.0.1:8899";
         let listener = tokio::net::TcpListener::bind(addr).await.expect("Failed to bind port 8899");
 
-        println!("backend launch success, port: 8899");
+        log::info!("backend launch success, port: 8899");
         tx.send(UserEvent::Start).unwrap();
 
         if let Err(e) = axum::serve(listener, app).await {
-            eprintln!("Server error: {}", e);
+            log::error!("Server error: {}", e);
         }
     })
 }
 
-#[cfg(all(feature = "enable-desktop", feature = "enable-webbrowser"))]
+#[cfg(all(feature = "enable-desktop", feature = "enable-webbrowser", not(target_os = "android"), not(target_os = "ios")))]
 pub mod my_window {
     pub fn run() {
         compile_error!("Cannot enable two-show \"enable-desktop\" and \"enable-webbrowsers\" features! it's cannot to compiler!!")
     }
 }
-#[cfg(all(not(feature = "enable-desktop"), not(feature = "enable-webbrowser")))]
+#[cfg(all(not(feature = "enable-desktop"), not(feature = "enable-webbrowser"), not(target_os = "android"), not(target_os = "ios")))]
 pub mod my_window {
     pub fn run() {
         compile_error!("Cannot enable non-window features! it's cannot to compiler!!")
     }
 }
-#[cfg(all(not(feature = "enable-desktop"), feature = "enable-webbrowser"))]
+#[cfg(all(not(feature = "enable-desktop"), feature = "enable-webbrowser", not(target_os = "android"), not(target_os = "ios")))]
 pub mod my_window {
     use super::*;
     pub fn run() {
@@ -111,23 +111,25 @@ pub mod my_window {
         if rx1.recv().unwrap() != UserEvent::Start {
             unreachable!()
         }
-        println!("get backend signal, start init window!");
+        log::info!("get backend signal, start init window!");
         let url = "http://localhost:8899";
         if let Err(e) = webbrowser::open(url) {
-            eprintln!("Cannot open default browser: {:?}，please open it manually: {}", e, url);
+            log::error!("Cannot open default browser: {:?}，please open it manually: {}", e, url);
         } else {
-            eprintln!("Open browser success! service launch in {}", url)
+            log::error!("Open browser success! service launch in {}", url)
         }
         if rx2.recv().unwrap() == UserEvent::ExitWindow {
             return;
         }
     }
 }
-#[cfg(all(feature = "enable-desktop", not(feature = "enable-webbrowser")))]
+#[cfg(any(all(feature = "enable-desktop", not(feature = "enable-webbrowser")), target_os = "android", target_os = "ios"))]
 pub mod my_window {
     use super::*;
     use tao::{
-        dpi::LogicalSize, event::{Event, StartCause, WindowEvent}, event_loop::{ControlFlow, EventLoopBuilder, EventLoopWindowTarget}, window::{Window, WindowBuilder},
+        event::{Event, StartCause, WindowEvent},
+        event_loop::{ControlFlow, EventLoopBuilder, EventLoopWindowTarget},
+        window::{Window, WindowBuilder},
     };
     use wry::{WebView, WebViewBuilder};
     pub fn run() {
@@ -154,7 +156,10 @@ pub mod my_window {
         std::thread::spawn(move || {
             run_backend_server(tx, exit_callback);
         });
-        println!("get backend signal, start init window!");
+        log::info!("get backend signal, start init window!");
+        if rx.recv().unwrap() != UserEvent::Start {
+            unreachable!();
+        }
         let mut webview = None;
         event_loop.run(move |event, event_loop, control_flow| {
             *control_flow = ControlFlow::Wait;
@@ -191,23 +196,23 @@ pub mod my_window {
     fn build_webview(
         event_loop: &EventLoopWindowTarget<UserEvent>,
     ) -> Result<(Window, WebView), Box<dyn std::error::Error>> {
-        #[cfg(any(target_os = "android", target_os = "ios"))]
-        let icon: Option<tao::window::Icon> = None;
         #[cfg(not(any(target_os = "android", target_os = "ios")))]
-        let icon: Option<tao::window::Icon> = {
-            if let Ok(img) = image::load_from_memory(WINDOW_ICON) {
-                let rgba = img
-                    .resize(64, 64, image::imageops::FilterType::Nearest)
-                    .to_rgba8();
-                tao::window::Icon::from_rgba(rgba.into_raw(), 64, 64).ok()
-            } else {
-                None
-            }
-        };
         let window = WindowBuilder::new()
-            .with_inner_size(LogicalSize::new(1280.0, 720.0))
+            .with_inner_size(tao::dpi::LogicalSize::new(1280.0, 720.0))
             .with_title(PACKAGE_NAME)
-            .with_window_icon(icon)
+            .with_window_icon(
+                if let Ok(img) = image::load_from_memory(WINDOW_ICON) {
+                    let rgba = img
+                        .resize(64, 64, image::imageops::FilterType::Nearest)
+                        .to_rgba8();
+                    tao::window::Icon::from_rgba(rgba.into_raw(), 64, 64).ok()
+                } else {
+                    None
+                })
+            .build(&event_loop)?;
+        #[cfg(any(target_os = "android", target_os = "ios"))]
+        let window = WindowBuilder::new()
+            .with_title(PACKAGE_NAME)
             .build(&event_loop)?;
         let builder = WebViewBuilder::new()
             .with_background_color((0, 0, 0, 255))
