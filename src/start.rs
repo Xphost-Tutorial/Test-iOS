@@ -154,9 +154,6 @@ pub mod my_window {
         std::thread::spawn(move || {
             run_backend_server(tx, exit_callback);
         });
-        if rx.recv().unwrap() != UserEvent::Start {
-            unreachable!()
-        }
         println!("get backend signal, start init window!");
         let mut webview = None;
         event_loop.run(move |event, event_loop, control_flow| {
