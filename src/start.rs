@@ -75,19 +75,19 @@ fn run_backend_server(tx: mpsc::Sender<UserEvent>, callback: EventCallback) {
         if let Err(e) = axum::serve(listener, app).await {
             log::error!("Server error: {}", e);
         }
-    })
+    });
 }
 
 #[cfg(all(feature = "enable-desktop", feature = "enable-webbrowser", not(target_os = "android"), not(target_os = "ios")))]
 pub mod my_window {
     pub fn run() {
-        compile_error!("Cannot enable two-show \"enable-desktop\" and \"enable-webbrowsers\" features! it's cannot to compiler!!")
+        compile_error!("Cannot enable two-show \"enable-desktop\" and \"enable-webbrowsers\" features! it's cannot to compiler!!");
     }
 }
 #[cfg(all(not(feature = "enable-desktop"), not(feature = "enable-webbrowser"), not(target_os = "android"), not(target_os = "ios")))]
 pub mod my_window {
     pub fn run() {
-        compile_error!("Cannot enable non-window features! it's cannot to compiler!!")
+        compile_error!("Cannot enable non-window features! it's cannot to compiler!!");
     }
 }
 #[cfg(all(not(feature = "enable-desktop"), feature = "enable-webbrowser", not(target_os = "android"), not(target_os = "ios")))]
