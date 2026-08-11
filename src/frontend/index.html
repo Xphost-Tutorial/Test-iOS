@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/icon.png">
     <title>Hello World!!</title>
     <link rel="stylesheet" href="/index.css">
@@ -9,38 +10,40 @@
     </style>
 </head>
 <body>
-    <main id="main">
-
-    </main>
     <script src="/util.js"></script>
     <script src="/backend.js"></script>
-    <script>
-        const nameEl = document.getElementById("name");
-        let wFullscreen = false;
-        function fullScreen() {
-            wFullscreen = !wFullscreen;
-            willFullscreen(wFullscreen);
-        }
-        function changeName() {
-            nameEl.innerText = "查询中...";
-            const userId = 1;
-            fetch(`/api/get/user/${userId}` , {
-                method: 'GET',
-                headers: { 'Content-Type': 'text/plain' }
-            })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error("找不到该用户");
-                }
-                return res.text();
-            })
-            .then(username => {
-                nameEl.innerText = username;
-            })
-            .catch(err => {
-                nameEl.innerText = err.message;
-            });
-        }
+    <main id="main">
+        <div id="main_box">
+
+        </div>
+    </main>
+    <script defer src="/index.js">
+        // const nameEl = document.getElementById("name");
+        // let wFullscreen = false;
+        // function fullScreen() {
+        //     wFullscreen = !wFullscreen;
+        //     willFullscreen(wFullscreen);
+        // }
+        // function changeName() {
+        //     nameEl.innerText = "查询中...";
+        //     const userId = 1;
+        //     fetch(`/api/get/user/${userId}` , {
+        //         method: 'GET',
+        //         headers: { 'Content-Type': 'text/plain' }
+        //     })
+        //     .then(res => {
+        //         if (!res.ok) {
+        //             throw new Error("找不到该用户");
+        //         }
+        //         return res.text();
+        //     })
+        //     .then(username => {
+        //         nameEl.innerText = username;
+        //     })
+        //     .catch(err => {
+        //         nameEl.innerText = err.message;
+        //     });
+        // }
     </script>
 </body>
 </html>

@@ -4,6 +4,7 @@ use axum::{
 };
 use tower_http::cors::{CorsLayer, Any};
 
+#[allow(unused_imports)]
 use crate::utils::constant::*;
 
 const WINDOW_ICON: &[u8] = include_bytes!("../icon.png");
@@ -65,17 +66,33 @@ fn run_backend_server(tx: mpsc::Sender<UserEvent>, callback: EventCallback) {
                     WINDOW_ICON
                 )
             }))
-            .route("/index.css", get(async || -> Html<&'static str> {
-                Html(include_str!("frontend/index.css"))
+            .route("/index.css", get(async || {
+                (
+                    StatusCode::OK,
+                    [(header::CONTENT_TYPE, "text/css")],
+                    include_bytes!("frontend/index.css")
+                )
             }))
-            .route("/index.js", get(async || -> Html<&'static str> {
-                Html(include_str!("frontend/index.js"))
+            .route("/index.js", get(async || {
+                (
+                    StatusCode::OK,
+                    [(header::CONTENT_TYPE, "text/javascript")],
+                    include_bytes!("frontend/index.js")
+                )
             }))
-            .route("/util.js", get(async || -> Html<&'static str> {
-                Html(include_str!("frontend/util.js"))
+            .route("/util.js", get(async || {
+                (
+                    StatusCode::OK,
+                    [(header::CONTENT_TYPE, "text/javascript")],
+                    include_bytes!("frontend/util.js")
+                )
             }))
-            .route("/backend.js", get(async || -> Html<&'static str> {
-                Html(include_str!("frontend/backend.js"))
+            .route("/backend.js", get(async || {
+                (
+                    StatusCode::OK,
+                    [(header::CONTENT_TYPE, "text/javascript")],
+                    include_bytes!("frontend/backend.js")
+                )
             }))
             .route("/api/exit_window", put(exit_window))
             .route("/api/set_full_screen", put(full_screen))

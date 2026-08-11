@@ -1,3 +1,7 @@
+* {
+    font-size: 1.5cqi;
+    user-select: none;
+}
 body {
     margin: 0;
     padding: 0;
@@ -9,4 +13,18 @@ body {
     position: fixed;
     top: 0;
     left: 0;
+}
+#main_box {
+    max-width: 100%;
+    max-height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    container-type: size;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background-color: red;
 }
