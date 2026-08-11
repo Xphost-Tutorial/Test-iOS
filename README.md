@@ -10,7 +10,7 @@ Lua 教程可以参考[官方教程 gitbook](https://candysharkstudio.gitbook.io
 
 请注意！使用本教程的 Lua 已经可以解决 99% 的 UI/UX 问题，视觉小说完全可以直接用这个做！还有 1% 的问题是可能实在是引擎部分解决不了的，需要手动修改 Ren'Rs 的源代码的。。
 
-是的！我们采取全部 UI 都使用（未知）框架去绘制！不仅性能++，跨平台性也++了！
+是的！我们采取全部 UI 都使用 Web 框架去绘制！不仅性能++，跨平台性也++了！
 
 本次跨平台的整合架构以及后端架构选择都在[这里](./CROSS_PLATFORM.md)
 
@@ -26,7 +26,7 @@ Lua 教程可以参考[官方教程 gitbook](https://candysharkstudio.gitbook.io
 3. 默认未使用 enable-desktop，默认未启用 enable-frontend，请各位按需启用。
 
 - **本地开发请提前下载 Python 并使用 change_by_json.py 去替换各位的项目基本信息！请修改 ren-rs.config.json 里面的内容！其余文件请酌情修改。。**
-- 在你不确定是否要提交 pr 时，请尽量不要随意修改源代码里面的内容！除了你要为那 1% 的内容进行开发除外。。但也尽量只动 ui 文件夹里的内容即可，别的地方暂时就不要动啦~
+- 在你不确定是否要提交 pr 时，请尽量不要随意修改源代码里面的内容！除了你要为那 1% 的内容进行开发除外。。但也尽量只动 `src/frontend` 文件夹里的内容即可，别的地方暂时就不要动啦~
 
 ### 如何进行 Android 开发？
 
@@ -42,7 +42,7 @@ Lua 教程可以参考[官方教程 gitbook](https://candysharkstudio.gitbook.io
 1. 安装 Xcode
 2. 安装 [cargo-mobile2](https://github.com/tauri-apps/cargo-mobile2)
 3. 在 Xcode 中下载 iOS 模拟器或者连接真机
-4. 在 gen/apple 目录下运行 `xcodegen generate`
+4. 在 gen/apple 目录下运行 `xcodegen generate`（如果没有 xcodegen，需提前使用 `brew install xcodegen` 安装！）
 5. 在项目根目录运行：`cargo apple run`
 
 好了！如果还有啥不懂的操作请观看我的 [RenRsAction](https://github.com/xphost008/RenRsAction) 项目哦~！
@@ -91,7 +91,7 @@ iOS 签名流程：你需要开通一个 Apple Developer 账号，然后在你�
 
 # 使用事宜
 
-本框架允许使用交叉编译！请各位自行添加：
+本框架仅在开启 enable-webbrowser 时允许使用交叉编译！请各位自行添加：
 
 ```bash
 rustup target add <你的架构>
