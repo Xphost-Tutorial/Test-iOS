@@ -38,8 +38,8 @@ WRY_ANDROID_KOTLIN_FILES_OUT_DIR = "<android-project-dir>/app/src/main/kotlin/co
 frameworks = [ "WebKit" ]
 
 [features]
-default = ["enable-desktop"]
-# 与 webbrowsers 互斥
+default = ["enable-webbrowser"]
+# 与 webbrowser 互斥
 enable-desktop = ["dep:wry", "dep:tao"]
 # 与 desktop 互斥
 enable-webbrowser = ["dep:webbrowser"]
@@ -65,7 +65,7 @@ image = "^0.25"
 
 # self add
 rusqlite = { version = "^0.40", features = ["bundled"] } # Rust SQLite wrapper!
-aes = "^0.9"
+aes = "^0.8"
 base64 = "^0.22"
 
 [target.'cfg(target_os = "android")'.dependencies]

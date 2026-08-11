@@ -1,0 +1,27 @@
+{
+  "global_constants": {
+    "MAIN_BACKGROUND_IMAGE": "MAIN_BACK",
+    "GRORGE_ILLUSTRATION": ""
+  },
+  "global_variables": {
+    "main_background_opacity": 0,
+    "main_button_group_opacity": 0,
+    "main_start_black_show": 0,
+    "main_settings_block_opacity": 0,
+    "main_settings_block_show": false,
+    "settings_music_volume": 100,
+    "settings_text_speed": 100,
+    "settings_is_fullscreen": false
+  },
+  "components": [
+
+  ],
+  "screens": [
+    {
+      "name": "main",
+      "components": [
+
+      ]
+    }
+  ]
+}

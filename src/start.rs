@@ -1,6 +1,6 @@
 use std::sync::{Arc, mpsc};
 use axum::{
-    Extension, Router, extract::Path, http::{StatusCode, header}, response::{Html, IntoResponse}, routing::{get, put},
+    Extension, Router, extract::Path, http::{StatusCode, header}, response::Html, routing::{get, put},
 };
 use tower_http::cors::{CorsLayer, Any};
 
@@ -10,7 +10,7 @@ const WINDOW_ICON: &[u8] = include_bytes!("../icon.png");
 
 #[derive(PartialEq, Eq)]
 enum UserEvent {
-    Start,
+    Pass,
     ExitWindow,
     FullScreen,
     ExitScreen,
@@ -30,14 +30,10 @@ async fn get_user(Path(user_id): Path<usize>) -> Result<String, StatusCode> {
 }
 async fn exit_window(Extension(callback): Extension<EventCallback>) -> StatusCode {
     callback(UserEvent::ExitWindow);
-    StatusCode::OK
-}
-async fn get_icon() -> impl IntoResponse {
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "image/png")],
-        WINDOW_ICON
-    )
+    #[cfg(not(feature = "enable-webbrowser"))]
+    return StatusCode::OK;
+    #[cfg(feature = "enable-webbrowser")]
+    return StatusCode::ACCEPTED;
 }
 async fn full_screen(Extension(callback): Extension<EventCallback>, is_full_screen: String) -> StatusCode {
     #[cfg(not(all(target_os = "android", target_os = "ios")))]
@@ -46,7 +42,10 @@ async fn full_screen(Extension(callback): Extension<EventCallback>, is_full_scre
     }else{
         callback(UserEvent::ExitScreen);
     }
-    StatusCode::OK
+    #[cfg(not(feature = "enable-webbrowser"))]
+    return StatusCode::OK;
+    #[cfg(feature = "enable-webbrowser")]
+    return StatusCode::ACCEPTED;
 }
 fn run_backend_server(tx: mpsc::Sender<UserEvent>, callback: EventCallback) {
     let rt = tokio::runtime::Runtime::new().unwrap();
@@ -59,10 +58,28 @@ fn run_backend_server(tx: mpsc::Sender<UserEvent>, callback: EventCallback) {
             .route("/", get(async || -> Html<&'static str> {
                 Html(include_str!("frontend/index.html"))
             }))
+            .route("/icon.png", get(async || {
+                (
+                    StatusCode::OK,
+                    [(header::CONTENT_TYPE, "image/png")],
+                    WINDOW_ICON
+                )
+            }))
+            .route("/index.css", get(async || -> Html<&'static str> {
+                Html(include_str!("frontend/index.css"))
+            }))
+            .route("/index.js", get(async || -> Html<&'static str> {
+                Html(include_str!("frontend/index.js"))
+            }))
+            .route("/util.js", get(async || -> Html<&'static str> {
+                Html(include_str!("frontend/util.js"))
+            }))
+            .route("/backend.js", get(async || -> Html<&'static str> {
+                Html(include_str!("frontend/backend.js"))
+            }))
             .route("/api/exit_window", put(exit_window))
             .route("/api/set_full_screen", put(full_screen))
             .route("/api/get/user/{id}", get(get_user))
-            .route("/icon.png", get(get_icon))
             .layer(cors)
             .layer(Extension(callback));
 
@@ -70,7 +87,7 @@ fn run_backend_server(tx: mpsc::Sender<UserEvent>, callback: EventCallback) {
         let listener = tokio::net::TcpListener::bind(addr).await.expect("Failed to bind port 8899");
 
         log::info!("backend launch success, port: 8899");
-        tx.send(UserEvent::Start).unwrap();
+        tx.send(UserEvent::Pass).unwrap();
 
         if let Err(e) = axum::serve(listener, app).await {
             log::error!("Server error: {}", e);
@@ -81,7 +98,7 @@ fn run_backend_server(tx: mpsc::Sender<UserEvent>, callback: EventCallback) {
 #[cfg(all(feature = "enable-desktop", feature = "enable-webbrowser", not(target_os = "android"), not(target_os = "ios")))]
 pub mod my_window {
     pub fn run() {
-        compile_error!("Cannot enable two-show \"enable-desktop\" and \"enable-webbrowsers\" features! it's cannot to compiler!!");
+        compile_error!("Cannot enable two-show \"enable-desktop\" and \"enable-webbrowser\" features! it's cannot to compiler!!");
     }
 }
 #[cfg(all(not(feature = "enable-desktop"), not(feature = "enable-webbrowser"), not(target_os = "android"), not(target_os = "ios")))]
@@ -108,15 +125,13 @@ pub mod my_window {
         std::thread::spawn(move || {
             run_backend_server(tx1, callback);
         });
-        if rx1.recv().unwrap() != UserEvent::Start {
-            unreachable!()
-        }
+        rx1.recv().unwrap();
         log::info!("get backend signal, start init window!");
         let url = "http://localhost:8899";
         if let Err(e) = webbrowser::open(url) {
             log::error!("Cannot open default browser: {:?}，please open it manually: {}", e, url);
         } else {
-            log::error!("Open browser success! service launch in {}", url)
+            log::info!("Open browser success! service launch in {}", url)
         }
         if rx2.recv().unwrap() == UserEvent::ExitWindow {
             return;
@@ -157,9 +172,7 @@ pub mod my_window {
             run_backend_server(tx, exit_callback);
         });
         log::info!("get backend signal, start init window!");
-        if rx.recv().unwrap() != UserEvent::Start {
-            unreachable!();
-        }
+        rx.recv().unwrap();
         let mut webview = None;
         event_loop.run(move |event, event_loop, control_flow| {
             *control_flow = ControlFlow::Wait;

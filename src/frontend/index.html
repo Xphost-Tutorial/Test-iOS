@@ -4,25 +4,23 @@
     <meta charset="utf-8">
     <link rel="icon" href="/icon.png">
     <title>Hello World!!</title>
+    <link rel="stylesheet" href="/index.css">
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: black;
-        }
     </style>
 </head>
 <body>
-    <h1 id="name" style="font-family: sans-serif; text-align: center; margin-top: 50px; color: white;">准备就绪...</h1>
-    <div style="text-align: center;">
-        <button onclick="changeName()" style="padding: 10px 20px; font-size: 16px;">查询用户</button>
-        <button onclick="fullScreen()" style="padding: 10px 20px; font-size: 16px;">全屏</button>
-        <button onclick="exitWindow()" style="padding: 10px 20px; font-size: 16px;">退出</button>
-    </div>
+    <main id="main">
 
+    </main>
+    <script src="/util.js"></script>
+    <script src="/backend.js"></script>
     <script>
         const nameEl = document.getElementById("name");
-        let isFullscreen = true;
+        let wFullscreen = false;
+        function fullScreen() {
+            wFullscreen = !wFullscreen;
+            willFullscreen(wFullscreen);
+        }
         function changeName() {
             nameEl.innerText = "查询中...";
             const userId = 1;
@@ -38,32 +36,6 @@
             })
             .then(username => {
                 nameEl.innerText = username;
-            })
-            .catch(err => {
-                nameEl.innerText = err.message;
-            });
-        }
-        function fullScreen() {
-            nameEl.innerText = "全屏中...";
-            fetch(`/api/set_full_screen` , {
-                method: 'PUT',
-                body: isFullscreen ? "1" : "0"
-            })
-            .then(() => {
-                nameEl.innerText = "全屏成功！";
-                isFullscreen = !isFullscreen;
-            })
-            .catch(err => {
-                nameEl.innerText = err.message;
-            });
-        }
-        function exitWindow() {
-            nameEl.innerText = "退出中...";
-            fetch(`/api/exit_window` , {
-                method: 'PUT'
-            })
-            .then(() => {
-                nameEl.innerText = "退出成功！";
             })
             .catch(err => {
                 nameEl.innerText = err.message;

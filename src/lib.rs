@@ -2,6 +2,7 @@ mod utils;
 
 mod start;
 mod steamworks;
+mod crypt;
 
 // Android 日志
 #[cfg(target_os = "android")]
